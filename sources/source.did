@@ -1,0 +1,87 @@
+type CanisterInitialArg = record { schedule : opt nat };
+type CanisterStatusResponse = record {
+  status : CanisterStatusType;
+  memory_size : nat;
+  cycles : nat;
+  settings : DefiniteCanisterSettings;
+  query_stats : QueryStats;
+  idle_cycles_burned_per_day : nat;
+  module_hash : opt vec nat8;
+  reserved_cycles : nat;
+};
+type CanisterStatusType = variant { stopped; stopping; running };
+type DefiniteCanisterSettings = record {
+  freezing_threshold : nat;
+  controllers : vec principal;
+  reserved_cycles_limit : nat;
+  memory_allocation : nat;
+  compute_allocation : nat;
+};
+type MigratedRecords = record {
+  records : vec Record;
+  next_id : nat64;
+  removed : nat64;
+};
+type PageData = record {
+  total : nat64;
+  data : vec Record;
+  page : nat64;
+  size : nat32;
+};
+type PauseReason = record { timestamp_nanos : int; message : text };
+type Permission = variant { Permitted : text; Forbidden : text };
+type PermissionUpdatedArg = variant {
+  UpdateRolePermission : record { text; opt vec text };
+  UpdateUserPermission : record { principal; opt vec text };
+  UpdateUserRole : record { principal; opt vec text };
+};
+type QueryPage = record { page : nat64; size : nat32 };
+type QueryStats = record {
+  response_payload_bytes_total : nat;
+  num_instructions_total : nat;
+  num_calls_total : nat;
+  request_payload_bytes_total : nat;
+};
+type Record = record {
+  id : nat64;
+  created : int;
+  topic : nat8;
+  content : text;
+  done : opt record { int; text };
+  caller : principal;
+};
+type RecordSearchArg = record {
+  id : opt record { opt nat64; opt nat64 };
+  created : opt record { opt nat64; opt nat64 };
+  topic : opt vec text;
+  content : opt text;
+  caller : opt vec principal;
+};
+service : (opt CanisterInitialArg) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  business_example_query : () -> (text) query;
+  business_example_set : (text) -> ();
+  canister_status : () -> (CanisterStatusResponse);
+  pause_query : () -> (bool) query;
+  pause_query_reason : () -> (opt PauseReason) query;
+  pause_replace : (opt text) -> ();
+  permission_all : () -> (vec Permission) query;
+  permission_assigned_by_user : (principal) -> (opt vec Permission) query;
+  permission_assigned_query : () -> (opt vec Permission) query;
+  permission_find_by_user : (principal) -> (vec text) query;
+  permission_query : () -> (vec text) query;
+  permission_roles_all : () -> (vec record { text; vec Permission }) query;
+  permission_roles_by_user : (principal) -> (opt vec text) query;
+  permission_roles_query : () -> (opt vec text) query;
+  permission_update : (vec PermissionUpdatedArg) -> ();
+  record_find_by_page : (QueryPage, opt RecordSearchArg) -> (PageData) query;
+  record_migrate : (nat32) -> (MigratedRecords);
+  record_topics : () -> (vec text) query;
+  schedule_find : () -> (opt nat64) query;
+  schedule_replace : (opt nat64) -> ();
+  schedule_trigger : () -> ();
+  version : () -> (nat32) query;
+  wallet_balance : () -> (nat) query;
+  wallet_receive : () -> (nat);
+  whoami : () -> (principal) query;
+}

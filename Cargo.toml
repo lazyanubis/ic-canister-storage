@@ -1,0 +1,36 @@
+[package]
+name = "template" # 项目名
+version = "0.0.1" # 版本
+edition = "2021"  # 大版本
+
+[lib]
+path = "src/lib.rs"     # 入口文件
+crate-type = ["cdylib"] # 包类型 https://doc.rust-lang.org/reference/linkage.html
+# bin 二进制可执行 crate，编译出的文件为二进制可执行文件。必须要有 main 函数作为入口。这种 crate 不需要在 Cargo.toml 中或 --crate-type 命令行参数中指定，会自动识别。
+# lib 库 crate。它其实并不是一种具体的库，它指代后面各种库 crate 中的一种，可以认为是一个代理名称（alias）。 通常来讲，如果什么都不配置，默认指的是 rlib, 会生成 .rlib 的文件。
+# rlib 是 Rust Library 特定静态中间库格式。如果只是纯 Rust 代码项目之间的依赖和调用，那么，用 rlib 就能完全满足使用需求。rlib 实现为一个 ar 归档文件。
+# dylib 动态库。 会在编译的时候，生成动态库（Linux 上为 .so, MacOS 上为 .dylib, Windows 上为 .dll）。动态库是平台相关的库。动态库在被依赖并链接时，不会被链接到目标文件中。这种动态库只能被 Rust 写的程序(或遵循 Rust 内部不稳定的规范的程序)调用。这个动态库可能依赖于其它动态库（比如，Linux 下用 C 语言写的 PostgreSQL 的 libpq.so，或者另一个编译成 "dylib" 的 Rust 动态库）。
+# cdylib C 规范动态库。与 dylib 类似，也会生成 .so, .dylib 或 .dll 文件。但是这种动态库可以被其它语言调用（因为几乎所有语言都有遵循 C 规范的 FFI 实现），也就是跨语言 FFI 使用。这个动态库可能依赖于其它动态库（比如，Linux 下用 C 语言写的 PostgreSQL 的 libpq.so）。
+# staticlib 静态库。编译会生成 .a 文件（在 Linux 和 MacOS 上），或 .lib 文件（在 Windows 上）。编译器会把所有实现的 Rust 库代码以及依赖的库代码全部编译到一个静态库文件中，也就是对外界不产生任何依赖了。这特别适合将 Rust 实现的功能封装好给第三方应用使用。
+# proc-macro 过程宏 crate. 这种 crate 里面只能导出过程宏，被导出的过程宏可以被其它 crate 引用。​​
+
+[profile.release]
+lto = true        # 用于启用链路时间优化
+opt-level = 'z'   # 优化级别
+codegen-units = 1 # 在整个crate中使用最高级别优化
+
+[dependencies]
+# Candid 是一种接口描述语言 (IDL)，用于与运行在 Internet 计算机上的容器（也称为服务或参与者）进行交互。
+# Candid crate 是 Candid 的序列化/反序列化库。您可以在 Rust 值和 Candid 之间以二进制和文本格式无缝转换。
+candid = "0.10"
+# IC Canister开发工具包
+ic-cdk = "0.13"
+# ic-certified-map = "0.4.0" # 可信验证
+
+serde = { version = "1", features = ["derive"] } # 序列化/反序列化框架
+serde_json = "1"                                 # json
+
+ic-canister-kit = { version = "1.0.6", features = ["call-once", "schedule"] }
+
+strum = "0.26"
+strum_macros = "0.26"

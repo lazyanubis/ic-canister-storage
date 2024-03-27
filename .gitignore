@@ -1,0 +1,4 @@
+.DS_Store
+target/
+.dfx/
+source_opt.wasm
