@@ -1,11 +1,11 @@
 {
     "canisters": {
-        "template": {
+        "service": {
             "type": "custom",
             "build": [
-                "cargo test -p template update_candid -- --nocapture",
+                "cargo test -p service update_candid -- --nocapture",
                 "cargo build --target wasm32-unknown-unknown --release",
-                "ic-wasm target/wasm32-unknown-unknown/release/template.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public",
+                "ic-wasm target/wasm32-unknown-unknown/release/service.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public",
                 "ic-wasm sources/source_opt.wasm -o sources/source_opt.wasm shrink"
             ],
             "wasm": "sources/source_opt.wasm",

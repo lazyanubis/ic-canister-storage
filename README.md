@@ -1,7 +1,7 @@
-# ic-canister-template
+# ic-canister-service
 
 模版项目
 
-仅使用堆内存，最大 **4G**
+1. 使用堆内存，最大 **4G**
 
-未使用稳定内存
+2. 使用稳定内存，最大 **400G**

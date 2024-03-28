@@ -329,6 +329,7 @@ dependencies = [
  "ic-cdk",
  "ic-cdk-timers",
  "ic-ledger-types",
+ "ic-stable-structures",
  "serde",
  "serde_json",
  "sha2",
@@ -389,6 +390,15 @@ dependencies = [
  "serde",
  "serde_bytes",
  "sha2",
+]
+
+[[package]]
+name = "ic-stable-structures"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a314297eb9edb4bbcc2e04d2e634e38d5900b68eadae661e927946d1aba3f9f7"
+dependencies = [
+ "ic_principal",
 ]
 
 [[package]]
@@ -590,6 +600,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "service"
+version = "0.0.1"
+dependencies = [
+ "candid",
+ "ic-canister-kit",
+ "ic-cdk",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "sha2"
 version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -670,19 +693,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "template"
-version = "0.0.1"
-dependencies = [
- "candid",
- "ic-canister-kit",
- "ic-cdk",
- "serde",
- "serde_json",
- "strum",
- "strum_macros",
 ]
 
 [[package]]

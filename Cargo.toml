@@ -1,5 +1,5 @@
 [package]
-name = "template" # 项目名
+name = "service"  # 项目名
 version = "0.0.1" # 版本
 edition = "2021"  # 大版本
 
@@ -30,7 +30,11 @@ ic-cdk = "0.13"
 serde = { version = "1", features = ["derive"] } # 序列化/反序列化框架
 serde_json = "1"                                 # json
 
-ic-canister-kit = { version = "1.0.6", features = ["call-once", "schedule"] }
+ic-canister-kit = { version = "1.0.6", features = [
+    "call-once",
+    "schedule",
+    "stable",
+] }
 
 strum = "0.26"
 strum_macros = "0.26"

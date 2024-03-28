@@ -17,6 +17,7 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
+type ExampleVec = record { vec_data : nat64 };
 type MigratedRecords = record {
   records : vec Record;
   next_id : nat64;
@@ -59,8 +60,20 @@ type RecordSearchArg = record {
 };
 service : (opt CanisterInitialArg) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
+  business_example_cell_query : () -> (text) query;
+  business_example_cell_set : (text) -> ();
+  business_example_log_query : () -> (vec text) query;
+  business_example_log_update : (text) -> (nat64);
+  business_example_map_query : () -> (vec record { nat64; text }) query;
+  business_example_map_update : (nat64, opt text) -> (opt text);
+  business_example_priority_queue_pop : () -> (opt nat64);
+  business_example_priority_queue_push : (nat64) -> ();
+  business_example_priority_queue_query : () -> (vec nat64) query;
   business_example_query : () -> (text) query;
   business_example_set : (text) -> ();
+  business_example_vec_pop : () -> (opt ExampleVec);
+  business_example_vec_push : (nat64) -> ();
+  business_example_vec_query : () -> (vec ExampleVec) query;
   canister_status : () -> (CanisterStatusResponse);
   pause_query : () -> (bool) query;
   pause_query_reason : () -> (opt PauseReason) query;
