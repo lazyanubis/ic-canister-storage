@@ -2,6 +2,5 @@
 target/
 .dfx/
 source_opt.wasm
-canister_ids.json
 assets-test/
 .args.*
