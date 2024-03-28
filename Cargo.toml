@@ -1,5 +1,5 @@
 [package]
-name = "service"  # 项目名
+name = "storage"  # 项目名
 version = "0.0.1" # 版本
 edition = "2021"  # 大版本
 
@@ -38,3 +38,9 @@ ic-canister-kit = { version = "1.0.6", features = [
 
 strum = "0.26"
 strum_macros = "0.26"
+
+sha2 = "0.10"            # hash
+hex = "0.4"
+percent-encoding = "2.2" # 网络模块 解析请求
+regex = "1.6"            # 网络模块 解析请求
+# chrono = "0.4.26"          # ! 网络模块 解析时间 无法编译

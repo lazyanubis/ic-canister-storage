@@ -10,6 +10,19 @@ type CanisterStatusResponse = record {
   reserved_cycles : nat;
 };
 type CanisterStatusType = variant { stopped; stopping; running };
+type CustomHttpRequest = record {
+  url : text;
+  method : text;
+  body : vec nat8;
+  headers : vec record { text; text };
+};
+type CustomHttpResponse = record {
+  body : vec nat8;
+  headers : vec record { text; text };
+  upgrade : opt bool;
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
+};
 type DefiniteCanisterSettings = record {
   freezing_threshold : nat;
   controllers : vec principal;
@@ -17,7 +30,6 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
-type ExampleVec = record { vec_data : nat64 };
 type MigratedRecords = record {
   records : vec Record;
   next_id : nat64;
@@ -35,6 +47,14 @@ type PermissionUpdatedArg = variant {
   UpdateRolePermission : record { text; opt vec text };
   UpdateUserPermission : record { principal; opt vec text };
   UpdateUserRole : record { principal; opt vec text };
+};
+type QueryFile = record {
+  created : int;
+  modified : int;
+  hash : text;
+  path : text;
+  size : nat64;
+  headers : vec record { text; text };
 };
 type QueryPage = record { page : nat64; size : nat32 };
 type QueryStats = record {
@@ -58,23 +78,45 @@ type RecordSearchArg = record {
   content : opt text;
   caller : opt vec principal;
 };
+type StreamingCallbackHttpResponse = record {
+  token : opt StreamingCallbackToken;
+  body : vec nat8;
+};
+type StreamingCallbackToken = record {
+  token : vec record { text; text };
+  path : text;
+};
+type StreamingStrategy = variant {
+  Callback : record {
+    token : StreamingCallbackToken;
+    callback : func (StreamingCallbackToken) -> (
+        StreamingCallbackHttpResponse,
+      ) query;
+  };
+};
+type UploadingArg = record {
+  hash : vec nat8;
+  chunk : vec nat8;
+  path : text;
+  size : nat64;
+  headers : vec record { text; text };
+  index : nat32;
+  chunk_size : nat32;
+};
 service : (opt CanisterInitialArg) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
-  business_example_cell_query : () -> (text) query;
-  business_example_cell_set : (text) -> ();
-  business_example_log_query : () -> (vec text) query;
-  business_example_log_update : (text) -> (nat64);
-  business_example_map_query : () -> (vec record { nat64; text }) query;
-  business_example_map_update : (nat64, opt text) -> (opt text);
-  business_example_priority_queue_pop : () -> (opt nat64);
-  business_example_priority_queue_push : (nat64) -> ();
-  business_example_priority_queue_query : () -> (vec nat64) query;
-  business_example_query : () -> (text) query;
-  business_example_set : (text) -> ();
-  business_example_vec_pop : () -> (opt ExampleVec);
-  business_example_vec_push : (nat64) -> ();
-  business_example_vec_query : () -> (vec ExampleVec) query;
+  business_delete : (vec text) -> ();
+  business_download : (text) -> (vec nat8) query;
+  business_download_by : (text, nat64, nat64) -> (vec nat8) query;
+  business_files : () -> (vec QueryFile) query;
+  business_hashed_find : () -> (bool) query;
+  business_hashed_update : (bool) -> ();
+  business_upload : (vec UploadingArg) -> ();
   canister_status : () -> (CanisterStatusResponse);
+  http_request : (CustomHttpRequest) -> (CustomHttpResponse) query;
+  http_streaming : (StreamingCallbackToken) -> (
+      StreamingCallbackHttpResponse,
+    ) query;
   pause_query : () -> (bool) query;
   pause_query_reason : () -> (opt PauseReason) query;
   pause_replace : (opt text) -> ();

@@ -1,6 +1,6 @@
-# ic-canister-service
+# ic-canister-storage
 
-模版项目
+文件存储项目
 
 1. 使用堆内存，最大 **4G**
 

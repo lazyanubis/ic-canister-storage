@@ -1,9 +1,11 @@
 {
-    "cSpell.words": [
-        "Nanos",
-        "nocapture",
-        "Pausable",
-        "rustdoc",
-        "Schedulable"
-    ]
+  "cSpell.words": [
+    "chrono",
+    "hasher",
+    "Nanos",
+    "nocapture",
+    "Pausable",
+    "rustdoc",
+    "Schedulable"
+  ]
 }

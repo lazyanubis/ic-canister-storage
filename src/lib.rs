@@ -14,4 +14,8 @@ mod stable; // 存储模块
 
 mod business; // 核心模块
 
+mod explore; // 核心模块
+
+mod http; // 核心模块
+
 mod common; // 由于有 candid 方法，必须放最后
