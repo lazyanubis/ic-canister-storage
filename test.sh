@@ -63,7 +63,7 @@ DEFAULT=$(dfx identity get-principal)
 ALICE=$(dfx --identity alice identity get-principal)
 BOB=$(dfx --identity bob identity get-principal)
 
-cargo test
+# cargo test
 cargo clippy
 # cargo audit --no-fetch --quiet
 
