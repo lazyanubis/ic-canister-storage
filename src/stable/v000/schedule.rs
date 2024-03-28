@@ -21,12 +21,12 @@ pub async fn schedule_task(record_by: Option<CallerId>) {
     );
 
     // ! 为了保证记录的完整性，不应当发生 panic
-    inner_task().await;
+    inner_task(record_by).await;
 
     // * 记录
     with_record_update_done(record_id);
 }
 
-async fn inner_task() {
-    ic_cdk::println!("do something");
+async fn inner_task(caller: Option<CallerId>) {
+    ic_cdk::println!("do something: {:?}", caller.map(|c| c.to_text()));
 }
