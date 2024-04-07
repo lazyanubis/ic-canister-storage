@@ -8,6 +8,7 @@
                 "ic-wasm target/wasm32-unknown-unknown/release/service.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public",
                 "ic-wasm sources/source_opt.wasm -o sources/source_opt.wasm shrink"
             ],
+            "gzip": true,
             "wasm": "sources/source_opt.wasm",
             "candid": "sources/source.did"
         }
