@@ -317,9 +317,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ic-canister-kit"
-version = "1.0.6"
+version = "1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "959bd4231162185e617ca2be48571b9c9935aac695d15a593aec28ed7f0a3380"
+checksum = "28d30625a65cf93ed4d7c3550e0391dca6c5e149c4c8bef2a4606ea3783b7552"
 dependencies = [
  "base32",
  "candid",
