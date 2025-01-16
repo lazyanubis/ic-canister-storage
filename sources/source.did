@@ -20,6 +20,11 @@ type DefiniteCanisterSettings = record {
   compute_allocation : nat;
 };
 type ExampleVec = record { vec_data : nat64 };
+type LogVisibility = variant {
+  controllers;
+  public;
+  allowed_viewers : vec principal;
+};
 type MigratedRecords = record {
   records : vec Record;
   next_id : nat64;

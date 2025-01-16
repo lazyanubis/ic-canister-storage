@@ -321,6 +321,7 @@ dependencies = [
  "hex",
  "ic-cdk",
  "ic-cdk-timers",
+ "ic-stable-structures",
  "serde",
  "sha2",
 ]
@@ -365,6 +366,15 @@ dependencies = [
  "serde",
  "serde_bytes",
  "slotmap",
+]
+
+[[package]]
+name = "ic-stable-structures"
+version = "0.6.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b492c5a16455ae78623eaa12ead96dda6c69a83c535b1b00789f19b381c8a24c"
+dependencies = [
+ "ic_principal",
 ]
 
 [[package]]

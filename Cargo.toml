@@ -45,6 +45,7 @@ ic-canister-kit = { version = "1.0.17", features = [
     "canister",
     "call-once",
     "schedule",
+    "stable",
 ] }
 
 strum = "0.26.3"
