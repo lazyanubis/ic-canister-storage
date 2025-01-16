@@ -43,16 +43,17 @@ serde_json = "1.0.135"                                 # json
 ic-canister-kit = { version = "1.0.17", features = [
     "identity",
     "canister",
+    "http",
     "call-once",
     "schedule",
     "stable",
 ] }
 
-strum = "0.26"
-strum_macros = "0.26"
+strum = "0.26.3"
+strum_macros = "0.26.4"
 
 sha2 = "0.10"            # hash
 hex = "0.4"
 percent-encoding = "2.2" # 网络模块 解析请求
-regex = "1.6"            # 网络模块 解析请求
+regex = "1.11.1"         # 网络模块 解析请求
 # chrono = "0.4.26"          # ! 网络模块 解析时间 无法编译

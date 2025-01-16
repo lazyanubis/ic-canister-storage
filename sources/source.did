@@ -13,11 +13,11 @@ type CanisterStatusType = variant { stopped; stopping; running };
 type CustomHttpRequest = record {
   url : text;
   method : text;
-  body : vec nat8;
+  body : blob;
   headers : vec record { text; text };
 };
 type CustomHttpResponse = record {
-  body : vec nat8;
+  body : blob;
   headers : vec record { text; text };
   upgrade : opt bool;
   streaming_strategy : opt StreamingStrategy;
@@ -31,6 +31,11 @@ type DefiniteCanisterSettings = record {
   wasm_memory_limit : nat;
   memory_allocation : nat;
   compute_allocation : nat;
+};
+type LogVisibility = variant {
+  controllers;
+  public;
+  allowed_viewers : vec principal;
 };
 type MigratedRecords = record {
   records : vec Record;
@@ -82,7 +87,7 @@ type RecordSearchArg = record {
 };
 type StreamingCallbackHttpResponse = record {
   token : opt StreamingCallbackToken;
-  body : vec nat8;
+  body : blob;
 };
 type StreamingCallbackToken = record {
   token : vec record { text; text };
@@ -97,8 +102,8 @@ type StreamingStrategy = variant {
   };
 };
 type UploadingArg = record {
-  hash : vec nat8;
-  chunk : vec nat8;
+  hash : blob;
+  chunk : blob;
   path : text;
   size : nat64;
   headers : vec record { text; text };
@@ -108,8 +113,8 @@ type UploadingArg = record {
 service : (opt CanisterInitialArg) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_delete : (vec text) -> ();
-  business_download : (text) -> (vec nat8) query;
-  business_download_by : (text, nat64, nat64) -> (vec nat8) query;
+  business_download : (text) -> (blob) query;
+  business_download_by : (text, nat64, nat64) -> (blob) query;
   business_files : () -> (vec QueryFile) query;
   business_hashed_find : () -> (bool) query;
   business_hashed_update : (bool) -> ();
