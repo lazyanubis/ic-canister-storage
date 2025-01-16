@@ -1,11 +1,18 @@
 {
-  "cSpell.words": [
-    "chrono",
-    "hasher",
-    "Nanos",
-    "nocapture",
-    "Pausable",
-    "rustdoc",
-    "Schedulable"
-  ]
+    "cSpell.words": [
+        "cdylib",
+        "clippy",
+        "codegen",
+        "dylib",
+        "libpq",
+        "Nanos",
+        "nocapture",
+        "Pausable",
+        "Permissable",
+        "rlib",
+        "rustdoc",
+        "Schedulable",
+        "serde",
+        "staticlib"
+    ]
 }
