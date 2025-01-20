@@ -69,7 +69,7 @@ cargo clippy
 
 # ! 1. 测试 template
 red "\n=========== 1. template ===========\n"
-dfx canister create template
+dfx canister create template # --with-cycles 50T
 dfx deploy --mode=reinstall --yes --argument "(null)" template
 template=$(canister_id "template")
 blue "Template Canister: $template"
