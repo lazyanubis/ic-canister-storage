@@ -3,8 +3,8 @@
 cargo clippy
 cargo test
 
-# dfx deploy --ic template # --mode=reinstall
+# dfx deploy --ic service # --mode=reinstall
 
-dfx canister --network ic call template pause_replace "(opt \"for updating\")"
-dfx deploy --network ic template
-dfx canister --network ic call template pause_replace "(null)"
+dfx canister --network ic call service pause_replace "(opt \"for updating\")"
+dfx deploy --network ic service
+dfx canister --network ic call service pause_replace "(null)"
