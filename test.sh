@@ -69,7 +69,7 @@ cargo clippy
 
 # ! 1. 测试 storage
 red "\n=========== 1. storage ===========\n"
-dfx canister create storage
+dfx canister create storage # --with-cycles 50T
 dfx deploy --mode=reinstall --yes --argument "(null)" storage
 storage=$(canister_id "storage")
 blue "Storage Canister: $storage"
