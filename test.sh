@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+start_time=$(date +%H:%M:%S)
+start_time_s=$(date +%s)
 
 # 运行完毕自动停止
 dfx stop
@@ -11,6 +13,7 @@ function red { echo "\033[31m$1\033[0m"; }
 function green { echo "\033[32m$1\033[0m"; }
 function yellow { echo "\033[33m$1\033[0m"; }
 function blue { echo "\033[34m$1\033[0m"; }
+function blue { echo "\033[34m$1\033[0m"; }
 
 function canister_id {
     # cat ".dfx/local/canister_ids.json"
@@ -18,44 +21,30 @@ function canister_id {
     echo $(dfx canister id $1)
 }
 
+function check {
+    if [ -n "$3" ]; then
+        if [[ $(echo $2 | grep "$3") != "" ]]; then
+            green "✅ Passed: $1 -> $2 -> $3"
+        else
+            red "❌ Failed: $1"
+            green "Expected: $2"
+            yellow "Got: $3"
+            red "Line: ./test.sh:$5 👉 ${4}"
+            exit 1
+        fi
+    fi
+}
+
 function test {
     tips="$1"
     result="$(echo $2 | tr -d '\n')"
-    need1="$3"
-    need2="$4"
-    need3="$5"
-    # echo $result
-    # echo $need1
-    # echo $need2
-    # echo $need3
-    if [[ $(echo $result | grep "$need1") != "" ]]; then
-        green "* Passed: $tips -> $result -> $need1"
-    else
-        red "* Failed: $tips"
-        green "Expected: $need1"
-        yellow "Got: $result"
-        exit 1
-    fi
-    if [[ $need2 != "" ]]; then
-        if [[ $(echo $result | grep "$need2") != "" ]]; then
-            green "* Passed: $tips -> $result -> $need2"
-        else
-            red "* Failed: $tips"
-            green "Expected: $need2"
-            yellow "Got: $result"
-            exit 1
-        fi
-    fi
-    if [[ $need3 != "" ]]; then
-        if [[ $(echo $result | grep "$need3") != "" ]]; then
-            green "* Passed: $tips -> $result -> $need3"
-        else
-            red "* Failed: $tips"
-            green "Expected: $need3"
-            yellow "Got: $result"
-            exit 1
-        fi
-    fi
+    check "$tips" "$result" "$3" "1" "$(caller 0)"
+    check "$tips" "$result" "$4" "2" "$(caller 0)"
+    check "$tips" "$result" "$5" "3" "$(caller 0)"
+    check "$tips" "$result" "$6" "4" "$(caller 0)"
+    check "$tips" "$result" "$7" "5" "$(caller 0)"
+    check "$tips" "$result" "$8" "6" "$(caller 0)"
+    check "$tips" "$result" "$9" "7" "$(caller 0)"
 }
 
 ANONYMOUS="2vxsx-fae"
@@ -79,7 +68,7 @@ if [ -z "$template" ]; then
     exit 1
 fi
 
-blue "1.1 permission permission_query"
+blue "\n1.1 permission permission_query"
 test "version" "$(dfx --identity alice canister call template version 2>&1)" '(1 : nat32)'
 test "permission_all" "$(dfx --identity alice canister call template permission_all 2>&1)" 'vec { variant { Forbidden = "PauseQuery" }; variant { Permitted = "PauseReplace" }'
 test "permission_query" "$(dfx --identity alice canister call template permission_query 2>&1)" '(vec { "PauseQuery"; "PermissionQuery"; "BusinessExampleQuery" })'
@@ -93,7 +82,7 @@ test "permission_update" "$(dfx --identity alice canister call template permissi
 test "permission_query" "$(dfx --identity alice canister call template permission_query 2>&1)" '(vec { "PauseQuery"; "PermissionQuery"; "BusinessExampleQuery" })'
 test "permission_query" "$(dfx canister call template permission_query 2>&1)" 'vec { "PauseQuery"; "PauseReplace"; "PermissionQuery"; "PermissionFind"; "PermissionUpdate"; "RecordFind"; "RecordMigrate"; "ScheduleFind"; "ScheduleReplace"; "ScheduleTrigger"; "BusinessExampleQuery"; "BusinessExampleSet";}'
 
-blue "1.2 permission permission update"
+blue "\n1.2 permission permission update"
 test "permission_query" "$(dfx canister call template permission_query 2>&1)" 'vec { "PauseQuery"; "PauseReplace"; "PermissionQuery"; "PermissionFind"; "PermissionUpdate"; "RecordFind"; "RecordMigrate"; "ScheduleFind"; "ScheduleReplace"; "ScheduleTrigger"; "BusinessExampleQuery"; "BusinessExampleSet";}'
 test "permission_query" "$(dfx --identity alice canister call template permission_query 2>&1)" 'vec { "PauseQuery"; "PermissionQuery"; "BusinessExampleQuery" }'
 test "permission_find_by_user" "$(dfx canister call template permission_find_by_user "(principal \"$DEFAULT\")" 2>&1)" 'vec { "PauseQuery"; "PauseReplace"; "PermissionQuery"; "PermissionFind"; "PermissionUpdate"; "RecordFind"; "RecordMigrate"; "ScheduleFind"; "ScheduleReplace"; "ScheduleTrigger"; "BusinessExampleQuery"; "BusinessExampleSet";}'
@@ -101,7 +90,7 @@ test "permission_find_by_user" "$(dfx canister call template permission_find_by_
 test "permission_find_by_user" "$(dfx --identity alice canister call template permission_find_by_user "(principal \"$DEFAULT\")" 2>&1)" "'PermissionFind' is required"
 test "permission_find_by_user" "$(dfx --identity alice canister call template permission_find_by_user "(principal \"$ALICE\")" 2>&1)" "'PermissionFind' is required"
 
-blue "1.3 permission roles"
+blue "\n1.3 permission roles"
 test "permission_query" "$(dfx --identity alice canister call template permission_query 2>&1)" 'vec { "PauseQuery"; "PermissionQuery"; "BusinessExampleQuery" }'
 test "permission_update" "$(dfx canister call template permission_update "(vec { variant { UpdateRolePermission=record{\"Admin\"; opt vec {\"PauseReplace\"; \"PauseQuery\"} } } })" 2>&1)" "()"
 test "permission_update" "$(dfx canister call template permission_update "(vec { variant { UpdateUserRole=record{principal \"$ALICE\"; opt vec {\"Admin\"} } } })" 2>&1)" "()"
@@ -109,18 +98,18 @@ test "permission_query" "$(dfx --identity alice canister call template permissio
 test "permission_update" "$(dfx canister call template permission_update "(vec { variant { UpdateUserRole=record{principal \"$ALICE\"; null } } })" 2>&1)" "()"
 test "permission_query" "$(dfx --identity alice canister call template permission_query 2>&1)" 'vec { "PauseQuery"; "PermissionQuery"; "BusinessExampleQuery" }'
 
-blue "2.1 pause permission"
+blue "\n2.1 pause permission"
 test "pause_query" "$(dfx canister call template pause_query 2>&1)" "(false)"
 test "pause_query_reason" "$(dfx canister call template pause_query_reason 2>&1)" "(null)"
 test "pause_replace" "$(dfx canister call template pause_replace "(opt \"reason\")" 2>&1)" "()"
 test "pause_query" "$(dfx canister call template pause_query 2>&1)" "(true)"
 test "pause_query_reason" "$(dfx canister call template pause_query_reason 2>&1)" "message = \"reason\""
 
-blue "2.2 pause permission by alice"
+blue "\n2.2 pause permission by alice"
 test "pause_query" "$(dfx --identity alice canister call template pause_query 2>&1)" "(true)"
 test "pause_query_reason" "$(dfx --identity alice canister call template pause_query_reason 2>&1)" "message = \"reason\""
 
-blue "2.3 pause no permission"
+blue "\n2.3 pause no permission"
 test "pause_replace" "$(dfx --identity alice canister call template pause_replace "(null)" 2>&1)" "'PauseReplace' is required"
 test "permission_update" "$(dfx canister call template permission_update "(vec { variant { UpdateUserPermission=record{principal \"$ALICE\"; opt vec { \"PauseReplace\";\"PauseQuery\" } } } })" 2>&1)" "()"
 test "pause_replace" "$(dfx --identity alice canister call template pause_replace "(null)" 2>&1)" "()"
@@ -129,13 +118,13 @@ test "pause_query_reason" "$(dfx --identity alice canister call template pause_q
 test "pause_query" "$(dfx canister call template pause_query 2>&1)" "(false)"
 test "pause_query_reason" "$(dfx canister call template pause_query_reason 2>&1)" "(null)"
 
-blue "3 record no permission"
+blue "\n3 record no permission"
 test "record_topics" "$(dfx --identity alice canister call template record_topics 2>&1)" "'RecordFind' is required"
 test "record_topics" "$(dfx canister call template record_topics 2>&1)" '"Example"' '"CyclesCharge"'
 test "record_find_by_page" "$(dfx canister call template record_find_by_page "(record{page=1:nat64;size=1:nat32},opt record{topic=opt vec{\"Pause\"}})" 2>&1)" "record { total = "
 test "record_migrate" "$(dfx canister call template record_migrate "(1:nat32)" 2>&1)" "removed = 0"
 
-blue "4 schedule"
+blue "\n4 schedule"
 test "schedule_find" "$(dfx --identity alice canister call template schedule_find 2>&1)" "'ScheduleFind' is required"
 test "schedule_find" "$(dfx canister call template schedule_find 2>&1)" "(null)"
 test "schedule_replace" "$(dfx --identity alice canister call template schedule_replace "(opt (1000000000:nat64))" 2>&1)" "'ScheduleReplace' is required"
@@ -146,7 +135,7 @@ sleep 2
 test "schedule_trigger" "$(dfx --identity alice canister call template schedule_trigger 2>&1)" "'ScheduleTrigger' is required"
 test "schedule_trigger" "$(dfx canister call template schedule_trigger 2>&1)" "()"
 
-blue "5 example business"
+blue "\n5 example business"
 test "business_example_query" "$(dfx --identity alice canister call template business_example_query 2>&1)" "\"\""
 test "business_example_query" "$(dfx canister call template business_example_query 2>&1)" "\"\""
 test "business_example_set" "$(dfx --identity alice canister call template business_example_set "(\"test string\")" 2>&1)" "'BusinessExampleSet' is required"
@@ -154,7 +143,7 @@ test "business_example_set" "$(dfx canister call template business_example_set "
 test "business_example_query" "$(dfx --identity alice canister call template business_example_query 2>&1)" "test string"
 test "business_example_query" "$(dfx canister call template business_example_query 2>&1)" "test string"
 
-blue "6 test stable data"
+blue "\n6 test stable data"
 test "pause_replace" "$(dfx canister call template pause_replace "(opt \"reason\")" 2>&1)" "()"
 test "pause_query" "$(dfx canister call template pause_query 2>&1)" "(true)"
 dfx canister install --mode=upgrade --upgrade-unchanged --argument "(null)" template
@@ -166,7 +155,14 @@ test "business_example_query" "$(dfx canister call template business_example_que
 
 echo ""
 green "=================== TEST COMPLETED AND SUCCESSFUL ==================="
-echo ""
+
+end_time=$(date +%H:%M:%S)
+end_time_s=$(date +%s)
+spend=$(($end_time_s - $start_time_s))
+spend_min=$(($spend / 60))
+echo ''
+echo "✅  $start_time -> $end_time" "Total: $spend seconds ($spend_min mins)"
+echo ''
 
 say test successful
 

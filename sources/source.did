@@ -1,4 +1,3 @@
-type CanisterInitialArg = record { schedule : opt nat };
 type CanisterStatusResponse = record {
   status : CanisterStatusType;
   memory_size : nat;
@@ -19,6 +18,8 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
+type InitArg = record { maintainers : opt vec principal; schedule : opt nat };
+type InitArgs = variant { V0 : InitArg; V1 : InitArg };
 type LogVisibility = variant {
   controllers;
   public;
@@ -64,7 +65,7 @@ type RecordSearchArg = record {
   content : opt text;
   caller : opt vec principal;
 };
-service : (opt CanisterInitialArg) -> {
+service : (opt InitArgs) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_example_query : () -> (text) query;
   business_example_set : (text) -> ();
