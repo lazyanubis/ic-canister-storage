@@ -107,10 +107,10 @@ fn pre_upgrade() {
         let mut memory = ic_canister_kit::stable::get_upgrades_memory();
         let mut memory = WriteUpgradeMemory::new(&mut memory);
 
-        memory.write_u64(record_id.into_inner()); // store record id
-        memory.write_u32(version); // store version
-        memory.write_u64(bytes.len() as u64); // store heap data length
-        memory.write(&bytes); // store heap data length
+        trap(memory.write_u64(record_id.into_inner())); // store record id
+        trap(memory.write_u32(version)); // store version
+        trap(memory.write_u64(bytes.len() as u64)); // store heap data length
+        trap(memory.write(&bytes)); // store heap data length
     });
 }
 

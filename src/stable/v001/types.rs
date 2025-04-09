@@ -153,11 +153,13 @@ pub struct ExampleCell {
 
 impl Storable for ExampleCell {
     fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(ic_canister_kit::functions::stable::to_bytes(self))
+        use ic_canister_kit::common::trap;
+        Cow::Owned(trap(ic_canister_kit::functions::stable::to_bytes(self)))
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        ic_canister_kit::functions::stable::from_bytes(&bytes)
+        use ic_canister_kit::common::trap;
+        trap(ic_canister_kit::functions::stable::from_bytes(&bytes))
     }
 
     const BOUND: Bound = Bound::Unbounded;
