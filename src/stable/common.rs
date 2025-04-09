@@ -92,8 +92,8 @@ fn post_upgrade(args: Option<UpgradeArgs>) {
 fn pre_upgrade() {
     let caller = caller();
     STATE.with(|state| {
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        state.borrow().pause_must_be_paused().unwrap(); // ! 必须是维护状态, 才可以升级
+        use ic_canister_kit::common::trap;
+        trap(state.borrow().pause_must_be_paused()); // ! 必须是维护状态, 才可以升级
         state.borrow_mut().schedule_stop(); // * 停止定时任务
 
         let record_id = state.borrow_mut().record_push(
@@ -107,10 +107,10 @@ fn pre_upgrade() {
         let mut memory = ic_canister_kit::stable::get_upgrades_memory();
         let mut memory = WriteUpgradeMemory::new(&mut memory);
 
-        memory.write_u64(record_id.into_inner()); // store record id
-        memory.write_u32(version); // store version
-        memory.write_u64(bytes.len() as u64); // store heap data length
-        memory.write(&bytes); // store heap data length
+        trap(memory.write_u64(record_id.into_inner())); // store record id
+        trap(memory.write_u32(version)); // store version
+        trap(memory.write_u64(bytes.len() as u64)); // store heap data length
+        trap(memory.write(&bytes)); // store heap data length
     });
 }
 

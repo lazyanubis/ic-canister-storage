@@ -24,8 +24,9 @@ pub fn wallet_receive() -> candid::Nat {
 
 #[ic_cdk::update]
 async fn canister_status() -> ic_cdk::api::management_canister::main::CanisterStatusResponse {
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    ic_canister_kit::canister::status::canister_status(ic_canister_kit::identity::self_canister_id()).await.unwrap()
+    use ic_canister_kit::{canister::status::canister_status, identity::self_canister_id};
+    let response = canister_status(self_canister_id()).await;
+    ic_canister_kit::common::trap(response)
 }
 
 #[ic_cdk::query]
@@ -82,14 +83,11 @@ fn pause_replace(reason: Option<String>) {
 // 所有权限
 #[ic_cdk::query(guard = "has_permission_query")]
 fn permission_all() -> Vec<Permission> {
+    use ic_canister_kit::common::trap;
+    use ic_canister_kit::functions::permission::basic::parse_all_permissions;
     with_state(|s| {
-        ACTIONS
-            .into_iter()
-            .map(|name| {
-                #[allow(clippy::unwrap_used)] // ? SAFETY
-                s.parse_permission(name).unwrap()
-            })
-            .collect()
+        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        trap(permissions.map_err(|e| e.to_string()))
     })
 }
 
@@ -103,14 +101,14 @@ fn permission_query() -> Vec<&'static str> {
 #[ic_cdk::query(guard = "has_permission_find")]
 fn permission_find_by_user(user_id: UserId) -> Vec<&'static str> {
     with_state(|s| {
-        ACTIONS
-            .into_iter()
-            .filter(|permission| {
-                s.permission_has(&user_id, &{
-                    #[allow(clippy::unwrap_used)] // ? SAFETY
-                    s.parse_permission(permission).unwrap()
-                })
-            })
+        use ic_canister_kit::common::trap;
+        use ic_canister_kit::functions::permission::basic::parse_all_permissions;
+        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        trap(permissions)
+            .iter()
+            .zip(ACTIONS)
+            .filter(|(permission, _)| s.permission_has(&user_id, permission))
+            .map(|(_, p)| p)
             .collect()
     })
 }
@@ -171,14 +169,13 @@ fn permission_update(args: Vec<PermissionUpdatedArg<String>>) {
 
     with_mut_state(
         |s, _done| {
-            #[allow(clippy::unwrap_used)] // ? SAFETY
+            use ic_canister_kit::common::trap;
             let args = args
                 .into_iter()
                 .map(|a| a.parse_permission(|n| s.parse_permission(n).map_err(|e| e.to_string())))
-                .collect::<Result<Vec<_>, _>>()
-                .unwrap();
-            #[allow(clippy::unwrap_used)] // ? SAFETY
-            s.permission_update(args).unwrap();
+                .collect::<Result<Vec<_>, _>>();
+            let args = trap(args);
+            trap(s.permission_update(args))
         },
         caller,
         RecordTopics::Permission.topic(),
@@ -197,17 +194,16 @@ fn record_topics() -> Vec<String> {
 // 查询所有 分页
 #[ic_cdk::query(guard = "has_record_find")]
 fn record_find_by_page(page: QueryPage, search: Option<RecordSearchArg>) -> PageData<Record> {
-    #[allow(clippy::unwrap_used)] // ? SAFETY
+    use ic_canister_kit::common::trap;
     let search = search
         .map(|s| s.into(|t| RecordTopics::from(t).map(|t| t.topic())))
-        .transpose()
-        .unwrap();
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    with_state(|s| {
+        .transpose();
+    let search = trap(search);
+    let result = with_state(|s| {
         s.record_find_by_page(&page, 1000, &search)
             .map(|p| p.into())
-    })
-    .unwrap()
+    });
+    trap(result)
 }
 
 // 移动
@@ -265,11 +261,7 @@ fn schedule_replace(schedule: Option<u64>) {
 async fn schedule_trigger() {
     let caller = caller();
 
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    with_mut_state_without_record(|s| {
-        s.pause_must_be_running() // 维护中不允许执行任务
-    })
-    .unwrap();
+    assert!(with_mut_state_without_record(|s| { s.pause_must_be_running() }).is_ok()); // 维护中不允许执行任务
 
     schedule_task(Some(caller)).await;
 }
