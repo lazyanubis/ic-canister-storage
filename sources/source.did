@@ -18,7 +18,7 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
-type InitArg = record { maintainers : opt vec principal; schedule : opt nat };
+type InitArg = record { supers : opt vec principal; schedule : opt nat };
 type InitArgs = variant { V0 : InitArg; V1 : InitArg };
 type LogVisibility = variant {
   controllers;
