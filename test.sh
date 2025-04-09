@@ -57,7 +57,7 @@ cargo clippy
 
 # ! 1. 测试 service
 red "\n=========== 1. service ===========\n"
-dfx canister create service # --with-cycles 50T
+dfx canister create service --specified-id "bkyz2-fmaaa-aaaaa-qaaaq-cai" # --with-cycles 50T
 dfx deploy --mode=reinstall --yes --argument "(null)" service
 service=$(canister_id "service")
 blue "Service Canister: $service"
