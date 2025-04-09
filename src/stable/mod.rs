@@ -22,6 +22,7 @@ pub enum State {
     V1(Box<v001::types::InnerState>),
     // * 👆👆 UPGRADE WARNING: 引入新版本
 }
+use State::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
 pub enum InitArgs {
@@ -36,8 +37,6 @@ pub enum UpgradeArgs {
     V1(Box<v001::types::UpgradeArg>),
     // * 👆👆 UPGRADE WARNING: 引入新版本
 }
-
-use State::*;
 
 // 初始化
 impl Initial<Option<InitArgs>> for State {
