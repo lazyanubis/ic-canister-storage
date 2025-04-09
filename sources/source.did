@@ -1,4 +1,3 @@
-type CanisterInitialArg = record { schedule : opt nat };
 type CanisterStatusResponse = record {
   status : CanisterStatusType;
   memory_size : nat;
@@ -65,7 +64,7 @@ type RecordSearchArg = record {
   content : opt text;
   caller : opt vec principal;
 };
-service : (opt CanisterInitialArg) -> {
+service : (opt InitArgs) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_example_cell_query : () -> (text) query;
   business_example_cell_set : (text) -> ();

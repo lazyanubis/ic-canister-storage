@@ -4,8 +4,9 @@ use std::collections::{HashMap, HashSet};
 use ic_canister_kit::identity::caller;
 use ic_canister_kit::types::*;
 
-use super::ParsePermission;
-use super::{schedule_task, CanisterInitialArg, ParsePermissionError, RecordTopics};
+use super::{
+    InitArgs, ParsePermission, ParsePermissionError, RecordTopics, UpgradeArgs, schedule_task,
+};
 use super::{State, State::*};
 
 // 默认值
@@ -46,15 +47,15 @@ thread_local! {
 // ==================== 初始化方法 ====================
 
 #[ic_cdk::init]
-fn initial(arg: Option<CanisterInitialArg>) {
+fn initial(args: Option<InitArgs>) {
     with_mut_state_without_record(|s| {
         let record_id = s.record_push(
             caller(),
             RecordTopics::Initial.topic(),
             format!("Initial by {}", caller().to_text()),
         );
-        s.upgrade();
-        s.init(arg.unwrap_or_else(CanisterInitialArg::none));
+        s.upgrade(None); // upgrade to latest version
+        s.init(args); // ! 初始化最新版本 
         s.schedule_reload(); // * 重置定时任务
         s.record_update(record_id, format!("Version: {}", s.version()));
     })
@@ -63,7 +64,7 @@ fn initial(arg: Option<CanisterInitialArg>) {
 // ==================== 升级时的恢复逻辑 ====================
 
 #[ic_cdk::post_upgrade]
-fn post_upgrade() {
+fn post_upgrade(args: Option<UpgradeArgs>) {
     STATE.with(|state| {
         let memory = ic_canister_kit::stable::get_upgrades_memory();
         let mut memory = ReadUpgradeMemory::new(&memory);
@@ -78,9 +79,7 @@ fn post_upgrade() {
         last_state.heap_from_bytes(&bytes); // 恢复数据
         *state.borrow_mut() = last_state;
 
-        state.borrow_mut().upgrade(); // ! 恢复后要进行升级到最新版本
-        let schedule = state.borrow().schedule_find();
-        state.borrow_mut().init(CanisterInitialArg { schedule }); // ! 升级到最新版本后, 需要执行初始化操作
+        state.borrow_mut().upgrade(args); // ! 恢复后要进行升级到最新版本
         state.borrow_mut().schedule_reload(); // * 重置定时任务
 
         let version = state.borrow().version(); // 先不可变借用取出版本号

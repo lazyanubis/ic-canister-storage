@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+start_time=$(date +%H:%M:%S)
+start_time_s=$(date +%s)
 
 # 运行完毕自动停止
 dfx stop
@@ -18,44 +20,30 @@ function canister_id {
     echo $(dfx canister id $1)
 }
 
+function check {
+    if [ -n "$3" ]; then
+        if [[ $(echo $2 | grep "$3") != "" ]]; then
+            green "✅ Passed: $1 -> $2 -> $3"
+        else
+            red "❌ Failed: $1"
+            green "Expected: $2"
+            yellow "Got: $3"
+            red "Line: ./test.sh:$5 👉 $4"
+            exit 1
+        fi
+    fi
+}
+
 function test {
     tips="$1"
     result="$(echo $2 | tr -d '\n')"
-    need1="$3"
-    need2="$4"
-    need3="$5"
-    # echo $result
-    # echo $need1
-    # echo $need2
-    # echo $need3
-    if [[ $(echo $result | grep "$need1") != "" ]]; then
-        green "* Passed: $tips -> $result -> $need1"
-    else
-        red "* Failed: $tips"
-        green "Expected: $need1"
-        yellow "Got: $result"
-        exit 1
-    fi
-    if [[ $need2 != "" ]]; then
-        if [[ $(echo $result | grep "$need2") != "" ]]; then
-            green "* Passed: $tips -> $result -> $need2"
-        else
-            red "* Failed: $tips"
-            green "Expected: $need2"
-            yellow "Got: $result"
-            exit 1
-        fi
-    fi
-    if [[ $need3 != "" ]]; then
-        if [[ $(echo $result | grep "$need3") != "" ]]; then
-            green "* Passed: $tips -> $result -> $need3"
-        else
-            red "* Failed: $tips"
-            green "Expected: $need3"
-            yellow "Got: $result"
-            exit 1
-        fi
-    fi
+    check "$tips" "$result" "$3" "1" "$(caller 0)"
+    check "$tips" "$result" "$4" "2" "$(caller 0)"
+    check "$tips" "$result" "$5" "3" "$(caller 0)"
+    check "$tips" "$result" "$6" "4" "$(caller 0)"
+    check "$tips" "$result" "$7" "5" "$(caller 0)"
+    check "$tips" "$result" "$8" "6" "$(caller 0)"
+    check "$tips" "$result" "$9" "7" "$(caller 0)"
 }
 
 ANONYMOUS="2vxsx-fae"
@@ -244,9 +232,13 @@ test "business_example_priority_queue_query" "$(dfx canister call service busine
 
 # test completed
 
-echo ""
-green "=================== TEST COMPLETED AND SUCCESSFUL ==================="
-echo ""
+green "\n=================== TEST COMPLETED AND SUCCESSFUL ===================\n"
+
+end_time=$(date +%H:%M:%S)
+end_time_s=$(date +%s)
+spend=$(($end_time_s - $start_time_s))
+spend_minutes=$(($spend / 60))
+echo "✅  $start_time -> $end_time" "Total: $spend seconds ($spend_minutes mins) 🎉🎉🎉\n"
 
 say test successful
 
