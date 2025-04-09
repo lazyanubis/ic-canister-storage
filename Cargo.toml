@@ -49,8 +49,8 @@ ic-canister-kit = { version = "1.0.27", features = [
     "stable",
 ] }
 
-strum = "0.26.3"
-strum_macros = "0.26.4"
+strum = "0.27.1"
+strum_macros = "0.27.1"
 
 sha2 = "0.10"            # hash
 hex = "0.4"

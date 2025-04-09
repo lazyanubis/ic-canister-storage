@@ -31,6 +31,8 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
+type InitArg = record { supers : opt vec principal; schedule : opt nat };
+type InitArgs = variant { V0 : InitArg; V1 : InitArg };
 type LogVisibility = variant {
   controllers;
   public;
@@ -109,7 +111,7 @@ type UploadingArg = record {
   index : nat32;
   chunk_size : nat32;
 };
-service : (opt CanisterInitialArg) -> {
+service : (opt InitArgs) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_delete : (vec text) -> ();
   business_download : (text) -> (blob) query;
