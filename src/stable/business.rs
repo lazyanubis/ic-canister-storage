@@ -9,7 +9,6 @@ pub use std::collections::{HashMap, HashSet};
 #[allow(unused)]
 pub use std::fmt::Display;
 
-#[allow(clippy::panic)] // ? SAFETY
 #[allow(unused_variables)]
 pub trait Business:
     Pausable<PauseReason>
@@ -21,10 +20,10 @@ pub trait Business:
     + StableHeap
 {
     fn business_example_query(&self) -> String {
-        panic!("Not supported operation by this version.")
+        ic_cdk::trap("Not supported operation by this version.")
     }
     fn business_example_update(&mut self, test: String) {
-        panic!("Not supported operation by this version.")
+        ic_cdk::trap("Not supported operation by this version.")
     }
 
     fn business_example_cell_query(&self) -> crate::stable::ExampleCell {

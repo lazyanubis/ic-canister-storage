@@ -26,8 +26,8 @@ function check {
             green "✅ Passed: $1 -> $2 -> $3"
         else
             red "❌ Failed: $1"
-            green "Expected: $2"
-            yellow "Got: $3"
+            green "Expected: $3"
+            yellow "Got: $2"
             red "Line: ./test.sh:$5 👉 $4"
             exit 1
         fi
@@ -238,7 +238,7 @@ end_time=$(date +%H:%M:%S)
 end_time_s=$(date +%s)
 spend=$(($end_time_s - $start_time_s))
 spend_minutes=$(($spend / 60))
-echo "✅  $start_time -> $end_time" "Total: $spend seconds ($spend_minutes mins) 🎉🎉🎉\n"
+echo "✅ $start_time -> $end_time" "Total: $spend seconds ($spend_minutes mins) 🎉🎉🎉\n"
 
 say test successful
 
