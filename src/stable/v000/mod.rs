@@ -1,8 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use ic_canister_kit::{
-    functions::permission::basic::maintainer_updated, identity::caller, types::*,
-};
+use ic_canister_kit::{functions::permission::basic::supers_updated, identity::caller, types::*};
 
 pub mod types;
 
@@ -28,7 +26,7 @@ impl Initial<Option<Box<InitArg>>> for InnerState {
         });
 
         let permissions = get_all_permissions(|n| self.parse_permission(n));
-        let updated = maintainer_updated(&maintainers, &permissions);
+        let updated = supers_updated(&maintainers, &permissions);
 
         // 刷新权限
         self.permission_reset(permissions);
@@ -56,7 +54,7 @@ impl Upgrade<Option<Box<UpgradeArg>>> for InnerState {
         let permissions = get_all_permissions(|n| self.parse_permission(n));
         let updated = maintainers
             .as_ref()
-            .map(|maintainers| maintainer_updated(maintainers, &permissions));
+            .map(|maintainers| supers_updated(maintainers, &permissions));
 
         // 刷新权限
         self.permission_reset(permissions);
