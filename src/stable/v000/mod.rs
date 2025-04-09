@@ -20,17 +20,17 @@ impl Initial<Option<Box<InitArg>>> for InnerState {
     fn init(&mut self, arg: Option<Box<InitArg>>) {
         let arg = arg.unwrap_or_default(); // ! 就算是 None，也要执行一次
 
-        // 维护人初始化
-        let maintainers = arg.maintainers.unwrap_or_else(|| {
-            vec![caller()] // 默认调用者为维护者
+        // 超级管理员初始化
+        let supers = arg.supers.unwrap_or_else(|| {
+            vec![caller()] // 默认调用者为超级管理员
         });
 
         let permissions = get_all_permissions(|n| self.parse_permission(n));
-        let updated = supers_updated(&maintainers, &permissions);
+        let updated = supers_updated(&supers, &permissions);
 
         // 刷新权限
         self.permission_reset(permissions);
-        // 维护者赋予所有权限
+        // 超级管理员赋予所有权限
         #[allow(clippy::unwrap_used)] // ? SAFETY
         self.permission_update(updated).unwrap(); // 插入权限
 
@@ -48,17 +48,17 @@ impl Upgrade<Option<Box<UpgradeArg>>> for InnerState {
             None => return, // ! None 表示升级无需处理数据
         };
 
-        // 维护人初始化
-        let maintainers = arg.maintainers;
+        // 超级管理员初始化
+        let supers = arg.supers;
 
         let permissions = get_all_permissions(|n| self.parse_permission(n));
-        let updated = maintainers
+        let updated = supers
             .as_ref()
-            .map(|maintainers| supers_updated(maintainers, &permissions));
+            .map(|supers| supers_updated(supers, &permissions));
 
         // 刷新权限
         self.permission_reset(permissions);
-        // 维护者赋予所有权限
+        // 超级管理员赋予所有权限
         if let Some(updated) = updated {
             #[allow(clippy::unwrap_used)] // ? SAFETY
             self.permission_update(updated).unwrap(); // 插入权限
