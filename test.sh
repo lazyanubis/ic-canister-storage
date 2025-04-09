@@ -13,7 +13,6 @@ function red { echo "\033[31m$1\033[0m"; }
 function green { echo "\033[32m$1\033[0m"; }
 function yellow { echo "\033[33m$1\033[0m"; }
 function blue { echo "\033[34m$1\033[0m"; }
-function blue { echo "\033[34m$1\033[0m"; }
 
 function canister_id {
     # cat ".dfx/local/canister_ids.json"
