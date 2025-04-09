@@ -25,10 +25,8 @@ pub fn wallet_receive() -> candid::Nat {
 #[ic_cdk::update]
 async fn canister_status() -> ic_cdk::api::management_canister::main::CanisterStatusResponse {
     use ic_canister_kit::{canister::status::canister_status, identity::self_canister_id};
-    match canister_status(self_canister_id()).await {
-        Ok(response) => response,
-        Err(err) => ic_cdk::trap(&err.to_string()),
-    }
+    let response = canister_status(self_canister_id()).await;
+    ic_canister_kit::common::trap(response)
 }
 
 #[ic_cdk::query]
@@ -85,15 +83,11 @@ fn pause_replace(reason: Option<String>) {
 // 所有权限
 #[ic_cdk::query(guard = "has_permission_query")]
 fn permission_all() -> Vec<Permission> {
+    use ic_canister_kit::common::trap;
+    use ic_canister_kit::functions::permission::basic::parse_all_permissions;
     with_state(|s| {
-        match ACTIONS
-            .into_iter()
-            .map(|name| s.parse_permission(name))
-            .collect::<Result<Vec<_>, _>>()
-        {
-            Ok(data) => data,
-            Err(err) => ic_cdk::trap(&err.to_string()),
-        }
+        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        trap(permissions.map_err(|e| e.to_string()))
     })
 }
 
@@ -107,15 +101,14 @@ fn permission_query() -> Vec<&'static str> {
 #[ic_cdk::query(guard = "has_permission_find")]
 fn permission_find_by_user(user_id: UserId) -> Vec<&'static str> {
     with_state(|s| {
-        ACTIONS
-            .into_iter()
-            .filter(|permission| {
-                let _permission = match s.parse_permission(permission) {
-                    Ok(data) => data,
-                    Err(err) => ic_cdk::trap(&err.to_string()),
-                };
-                s.permission_has(&user_id, &_permission)
-            })
+        use ic_canister_kit::common::trap;
+        use ic_canister_kit::functions::permission::basic::parse_all_permissions;
+        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        trap(permissions)
+            .iter()
+            .zip(ACTIONS)
+            .filter(|(permission, _)| s.permission_has(&user_id, permission))
+            .map(|(_, p)| p)
             .collect()
     })
 }
@@ -176,17 +169,13 @@ fn permission_update(args: Vec<PermissionUpdatedArg<String>>) {
 
     with_mut_state(
         |s, _done| {
-            let args = match args
+            use ic_canister_kit::common::trap;
+            let args = args
                 .into_iter()
                 .map(|a| a.parse_permission(|n| s.parse_permission(n).map_err(|e| e.to_string())))
-                .collect::<Result<Vec<_>, _>>()
-            {
-                Ok(data) => data,
-                Err(err) => ic_cdk::trap(&err.to_string()),
-            };
-            if let Err(err) = s.permission_update(args) {
-                ic_cdk::trap(&err.to_string())
-            }
+                .collect::<Result<Vec<_>, _>>();
+            let args = trap(args);
+            trap(s.permission_update(args))
         },
         caller,
         RecordTopics::Permission.topic(),
@@ -205,20 +194,16 @@ fn record_topics() -> Vec<String> {
 // 查询所有 分页
 #[ic_cdk::query(guard = "has_record_find")]
 fn record_find_by_page(page: QueryPage, search: Option<RecordSearchArg>) -> PageData<Record> {
-    let search = match search
+    use ic_canister_kit::common::trap;
+    let search = search
         .map(|s| s.into(|t| RecordTopics::from(t).map(|t| t.topic())))
-        .transpose()
-    {
-        Ok(data) => data,
-        Err(err) => ic_cdk::trap(&err.to_string()),
-    };
-    match with_state(|s| {
+        .transpose();
+    let search = trap(search);
+    let result = with_state(|s| {
         s.record_find_by_page(&page, 1000, &search)
             .map(|p| p.into())
-    }) {
-        Ok(data) => data,
-        Err(err) => ic_cdk::trap(&err.to_string()),
-    }
+    });
+    trap(result)
 }
 
 // 移动

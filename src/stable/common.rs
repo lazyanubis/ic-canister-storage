@@ -63,10 +63,8 @@ fn initial(args: Option<InitArgs>) {
 #[ic_cdk::post_upgrade]
 fn post_upgrade(args: Option<UpgradeArgs>) {
     STATE.with(|state| {
-        let stable: (RecordId, u32, Vec<u8>) = match ic_cdk::storage::stable_restore() {
-            Ok(stable) => stable,
-            Err(message) => ic_cdk::trap(&message), // ! 读档失败
-        };
+        let stable = ic_cdk::storage::stable_restore();
+        let stable: (RecordId, u32, Vec<u8>) = ic_canister_kit::common::trap(stable); // ! 可能读档失败
         let (record_id, version, bytes) = stable;
 
         // 利用版本号恢复升级前的版本
@@ -90,9 +88,8 @@ fn post_upgrade(args: Option<UpgradeArgs>) {
 fn pre_upgrade() {
     let caller = caller();
     STATE.with(|state| {
-        if let Err(message) = state.borrow().pause_must_be_paused() {
-            ic_cdk::trap(&message); // ! 必须是维护状态, 才可以升级
-        };
+        use ic_canister_kit::common::trap;
+        trap(state.borrow().pause_must_be_paused()); // ! 必须是维护状态, 才可以升级
         state.borrow_mut().schedule_stop(); // * 停止定时任务
 
         let record_id = state.borrow_mut().record_push(
@@ -104,9 +101,7 @@ fn pre_upgrade() {
         let bytes = state.borrow().heap_to_bytes();
 
         let stable: (RecordId, u32, Vec<u8>) = (record_id, version, bytes);
-        if let Err(err) = ic_cdk::storage::stable_save(stable) {
-            ic_cdk::trap(&err.to_string()) // ! 存档失败
-        }
+        trap(ic_cdk::storage::stable_save(stable)); // ! 可能存档失败
     });
 }
 

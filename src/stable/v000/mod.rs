@@ -151,16 +151,12 @@ impl ScheduleTask for InnerState {}
 
 impl StableHeap for InnerState {
     fn heap_to_bytes(&self) -> Vec<u8> {
-        match ic_canister_kit::functions::stable::to_bytes(&self) {
-            Ok(bytes) => bytes,
-            Err(message) => ic_cdk::trap(message),
-        }
+        let bytes = ic_canister_kit::functions::stable::to_bytes(&self);
+        ic_canister_kit::common::trap(bytes)
     }
 
     fn heap_from_bytes(&mut self, bytes: &[u8]) {
-        *self = match ic_canister_kit::functions::stable::from_bytes(bytes) {
-            Ok(state) => state,
-            Err(message) => ic_cdk::trap(message),
-        };
+        let state = ic_canister_kit::functions::stable::from_bytes(bytes);
+        *self = ic_canister_kit::common::trap(state);
     }
 }

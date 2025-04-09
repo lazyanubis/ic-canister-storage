@@ -44,10 +44,10 @@ pub(super) fn get_all_permissions<'a, F>(parse: F) -> HashSet<Permission>
 where
     F: Fn(&'a str) -> Result<Permission, ParsePermissionError<'a>>,
 {
-    match ic_canister_kit::functions::permission::basic::parse_all_permissions(&ACTIONS, parse) {
-        Ok(permissions) => permissions,
-        Err(err) => ic_cdk::trap(&format!("Failed to parse permissions: {err:?}")),
-    }
+    use ic_canister_kit::functions::permission::basic::parse_all_permissions;
+    let permissions = parse_all_permissions(&ACTIONS, parse);
+    let permissions = ic_canister_kit::common::trap(permissions);
+    permissions.into_iter().collect()
 }
 
 // 权限默认状态
