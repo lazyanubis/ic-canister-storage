@@ -136,7 +136,7 @@ fn set_headers<'a>(
                 .map(|m| &params[m.start()..m.end()])
                 .unwrap_or("");
             if file_name.is_empty() {
-                file_name = file.path.split('/').last().unwrap_or_default();
+                file_name = file.path.split('/').next_back().unwrap_or_default();
             }
             if !file_name.is_empty() {
                 headers.insert(
