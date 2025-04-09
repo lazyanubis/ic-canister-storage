@@ -31,8 +31,7 @@ impl Initial<Option<Box<InitArg>>> for InnerState {
         // 刷新权限
         self.permission_reset(permissions);
         // 超级管理员赋予所有权限
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        self.permission_update(updated).unwrap(); // 插入权限
+        assert!(self.permission_update(updated).is_ok()); // 插入权限
 
         // 定时任务
         self.schedule_replace(arg.schedule);
@@ -60,8 +59,7 @@ impl Upgrade<Option<Box<UpgradeArg>>> for InnerState {
         self.permission_reset(permissions);
         // 超级管理员赋予所有权限
         if let Some(updated) = updated {
-            #[allow(clippy::unwrap_used)] // ? SAFETY
-            self.permission_update(updated).unwrap(); // 插入权限
+            assert!(self.permission_update(updated).is_ok()); // 插入权限
         }
 
         // 定时任务
@@ -153,10 +151,12 @@ impl ScheduleTask for InnerState {}
 
 impl StableHeap for InnerState {
     fn heap_to_bytes(&self) -> Vec<u8> {
-        ic_canister_kit::functions::stable::to_bytes(&self)
+        let bytes = ic_canister_kit::functions::stable::to_bytes(&self);
+        ic_canister_kit::common::trap(bytes)
     }
 
     fn heap_from_bytes(&mut self, bytes: &[u8]) {
-        *self = ic_canister_kit::functions::stable::from_bytes(bytes)
+        let state = ic_canister_kit::functions::stable::from_bytes(bytes);
+        *self = ic_canister_kit::common::trap(state);
     }
 }

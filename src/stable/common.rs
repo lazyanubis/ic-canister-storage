@@ -92,8 +92,8 @@ fn post_upgrade(args: Option<UpgradeArgs>) {
 fn pre_upgrade() {
     let caller = caller();
     STATE.with(|state| {
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        state.borrow().pause_must_be_paused().unwrap(); // ! 必须是维护状态, 才可以升级
+        use ic_canister_kit::common::trap;
+        trap(state.borrow().pause_must_be_paused()); // ! 必须是维护状态, 才可以升级
         state.borrow_mut().schedule_stop(); // * 停止定时任务
 
         let record_id = state.borrow_mut().record_push(
