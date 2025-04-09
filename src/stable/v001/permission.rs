@@ -39,12 +39,14 @@ pub const ACTIONS: [&str; 12] = [
     ACTION_BUSINESS_EXAMPLE_SET,
 ];
 
-#[allow(clippy::unwrap_used)] // ? SAFETY
 pub(super) fn get_all_permissions<'a, F>(parse: F) -> HashSet<Permission>
 where
     F: Fn(&'a str) -> Result<Permission, ParsePermissionError<'a>>,
 {
-    ic_canister_kit::functions::permission::basic::parse_all_permissions(&ACTIONS, parse).unwrap()
+    match ic_canister_kit::functions::permission::basic::parse_all_permissions(&ACTIONS, parse) {
+        Ok(permissions) => permissions,
+        Err(err) => ic_cdk::trap(&format!("Failed to parse permissions: {err:?}")),
+    }
 }
 
 // 权限默认状态

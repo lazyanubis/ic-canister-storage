@@ -63,8 +63,10 @@ fn initial(args: Option<InitArgs>) {
 #[ic_cdk::post_upgrade]
 fn post_upgrade(args: Option<UpgradeArgs>) {
     STATE.with(|state| {
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        let stable: (RecordId, u32, Vec<u8>) = ic_cdk::storage::stable_restore().unwrap();
+        let stable: (RecordId, u32, Vec<u8>) = match ic_cdk::storage::stable_restore() {
+            Ok(stable) => stable,
+            Err(message) => ic_cdk::trap(&message), // ! 读档失败
+        };
         let (record_id, version, bytes) = stable;
 
         // 利用版本号恢复升级前的版本
@@ -88,8 +90,9 @@ fn post_upgrade(args: Option<UpgradeArgs>) {
 fn pre_upgrade() {
     let caller = caller();
     STATE.with(|state| {
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        state.borrow().pause_must_be_paused().unwrap(); // ! 必须是维护状态, 才可以升级
+        if let Err(message) = state.borrow().pause_must_be_paused() {
+            ic_cdk::trap(&message); // ! 必须是维护状态, 才可以升级
+        };
         state.borrow_mut().schedule_stop(); // * 停止定时任务
 
         let record_id = state.borrow_mut().record_push(
@@ -101,8 +104,9 @@ fn pre_upgrade() {
         let bytes = state.borrow().heap_to_bytes();
 
         let stable: (RecordId, u32, Vec<u8>) = (record_id, version, bytes);
-        #[allow(clippy::unwrap_used)] // ? SAFETY
-        ic_cdk::storage::stable_save(stable).unwrap();
+        if let Err(err) = ic_cdk::storage::stable_save(stable) {
+            ic_cdk::trap(&err.to_string()) // ! 存档失败
+        }
     });
 }
 

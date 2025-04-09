@@ -24,8 +24,11 @@ pub fn wallet_receive() -> candid::Nat {
 
 #[ic_cdk::update]
 async fn canister_status() -> ic_cdk::api::management_canister::main::CanisterStatusResponse {
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    ic_canister_kit::canister::status::canister_status(ic_canister_kit::identity::self_canister_id()).await.unwrap()
+    use ic_canister_kit::{canister::status::canister_status, identity::self_canister_id};
+    match canister_status(self_canister_id()).await {
+        Ok(response) => response,
+        Err(err) => ic_cdk::trap(&err.to_string()),
+    }
 }
 
 #[ic_cdk::query]
@@ -83,13 +86,14 @@ fn pause_replace(reason: Option<String>) {
 #[ic_cdk::query(guard = "has_permission_query")]
 fn permission_all() -> Vec<Permission> {
     with_state(|s| {
-        ACTIONS
+        match ACTIONS
             .into_iter()
-            .map(|name| {
-                #[allow(clippy::unwrap_used)] // ? SAFETY
-                s.parse_permission(name).unwrap()
-            })
-            .collect()
+            .map(|name| s.parse_permission(name))
+            .collect::<Result<Vec<_>, _>>()
+        {
+            Ok(data) => data,
+            Err(err) => ic_cdk::trap(&err.to_string()),
+        }
     })
 }
 
@@ -106,10 +110,11 @@ fn permission_find_by_user(user_id: UserId) -> Vec<&'static str> {
         ACTIONS
             .into_iter()
             .filter(|permission| {
-                s.permission_has(&user_id, &{
-                    #[allow(clippy::unwrap_used)] // ? SAFETY
-                    s.parse_permission(permission).unwrap()
-                })
+                let _permission = match s.parse_permission(permission) {
+                    Ok(data) => data,
+                    Err(err) => ic_cdk::trap(&err.to_string()),
+                };
+                s.permission_has(&user_id, &_permission)
             })
             .collect()
     })
@@ -171,14 +176,17 @@ fn permission_update(args: Vec<PermissionUpdatedArg<String>>) {
 
     with_mut_state(
         |s, _done| {
-            #[allow(clippy::unwrap_used)] // ? SAFETY
-            let args = args
+            let args = match args
                 .into_iter()
                 .map(|a| a.parse_permission(|n| s.parse_permission(n).map_err(|e| e.to_string())))
                 .collect::<Result<Vec<_>, _>>()
-                .unwrap();
-            #[allow(clippy::unwrap_used)] // ? SAFETY
-            s.permission_update(args).unwrap();
+            {
+                Ok(data) => data,
+                Err(err) => ic_cdk::trap(&err.to_string()),
+            };
+            if let Err(err) = s.permission_update(args) {
+                ic_cdk::trap(&err.to_string())
+            }
         },
         caller,
         RecordTopics::Permission.topic(),
@@ -197,17 +205,20 @@ fn record_topics() -> Vec<String> {
 // 查询所有 分页
 #[ic_cdk::query(guard = "has_record_find")]
 fn record_find_by_page(page: QueryPage, search: Option<RecordSearchArg>) -> PageData<Record> {
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    let search = search
+    let search = match search
         .map(|s| s.into(|t| RecordTopics::from(t).map(|t| t.topic())))
         .transpose()
-        .unwrap();
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    with_state(|s| {
+    {
+        Ok(data) => data,
+        Err(err) => ic_cdk::trap(&err.to_string()),
+    };
+    match with_state(|s| {
         s.record_find_by_page(&page, 1000, &search)
             .map(|p| p.into())
-    })
-    .unwrap()
+    }) {
+        Ok(data) => data,
+        Err(err) => ic_cdk::trap(&err.to_string()),
+    }
 }
 
 // 移动
@@ -265,11 +276,7 @@ fn schedule_replace(schedule: Option<u64>) {
 async fn schedule_trigger() {
     let caller = caller();
 
-    #[allow(clippy::unwrap_used)] // ? SAFETY
-    with_mut_state_without_record(|s| {
-        s.pause_must_be_running() // 维护中不允许执行任务
-    })
-    .unwrap();
+    assert!(with_mut_state_without_record(|s| { s.pause_must_be_running() }).is_ok()); // 维护中不允许执行任务
 
     schedule_task(Some(caller)).await;
 }
