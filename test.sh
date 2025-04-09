@@ -152,13 +152,13 @@ test "business_example_query" "$(dfx canister call template business_example_que
 
 # test completed
 
-green "\n=================== TEST COMPLETED AND SUCCESSFUL ==================="
+green "\n=================== TEST COMPLETED AND SUCCESSFUL ===================\n"
 
 end_time=$(date +%H:%M:%S)
 end_time_s=$(date +%s)
 spend=$(($end_time_s - $start_time_s))
 spend_minutes=$(($spend / 60))
-echo "\n✅  $start_time -> $end_time" "Total: $spend seconds ($spend_minutes mins) 🎉🎉🎉\n"
+echo "✅  $start_time -> $end_time" "Total: $spend seconds ($spend_minutes mins) 🎉🎉🎉\n"
 
 say test successful
 
