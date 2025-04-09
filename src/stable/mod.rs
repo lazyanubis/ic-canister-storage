@@ -8,19 +8,6 @@ pub use common::*;
 mod business;
 pub use business::*;
 
-// 本罐子需要的权限转换
-pub trait ParsePermission {
-    fn parse_permission<'a>(&self, name: &'a str) -> Result<Permission, ParsePermissionError<'a>>;
-}
-#[derive(CandidType, Serialize, Debug, Clone)]
-pub struct ParsePermissionError<'a>(&'a str);
-impl Display for ParsePermissionError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ParsePermissionError: {}", self.0)
-    }
-}
-impl std::error::Error for ParsePermissionError<'_> {}
-
 // ==================== 更新版本需要修改下面代码 ====================
 
 mod v000;
@@ -36,10 +23,80 @@ pub enum State {
     // * 👆👆 UPGRADE WARNING: 引入新版本
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
+pub enum InitArgs {
+    V0(Box<v000::types::InitArg>),
+    V1(Box<v001::types::InitArg>),
+    // * 👆👆 UPGRADE WARNING: 引入新版本
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
+pub enum UpgradeArgs {
+    V0(Box<v000::types::UpgradeArg>),
+    V1(Box<v001::types::UpgradeArg>),
+    // * 👆👆 UPGRADE WARNING: 引入新版本
+}
+
 use State::*;
 
+// 初始化
+impl Initial<Option<InitArgs>> for State {
+    fn init(&mut self, args: Option<InitArgs>) {
+        match args {
+            Some(args) => match (self, args) {
+                (V0(s), InitArgs::V0(arg)) => s.init(Some(arg)),
+                (V1(s), InitArgs::V1(arg)) => s.init(Some(arg)),
+                // ! 👆👆 新增版本需要添加默认的数据
+                _ => {
+                    #[allow(clippy::panic)] // ? SAFETY
+                    {
+                        panic!("version mismatched")
+                    }
+                }
+            },
+            None => match self {
+                V0(s) => s.init(None),
+                V1(s) => s.init(None),
+            },
+        }
+    }
+}
+
 // 升级版本
-impl Upgrade for State {
+impl Upgrade<Option<UpgradeArgs>> for State {
+    fn upgrade(&mut self, args: Option<UpgradeArgs>) {
+        'outer: loop {
+            // 进行升级操作, 不断地升到下一版本
+            match self {
+                V0(s) => *self = V1(std::mem::take(&mut *s).into()), // -> V1
+                V1(_) => break 'outer,                               // same version do nothing
+            }
+        }
+
+        // handle args
+        match args {
+            Some(args) => {
+                match (self, args) {
+                    (V0(s), UpgradeArgs::V0(arg)) => s.upgrade(Some(arg)),
+                    (V1(s), UpgradeArgs::V1(arg)) => s.upgrade(Some(arg)),
+                    // ! 👆👆 新增版本需要添加默认的数据
+                    _ => {
+                        #[allow(clippy::panic)] // ? SAFETY
+                        {
+                            panic!("version mismatched")
+                        }
+                    }
+                }
+            }
+            None => match self {
+                V0(s) => s.upgrade(None),
+                V1(s) => s.upgrade(None),
+            },
+        }
+    }
+}
+
+impl StateUpgrade<Option<UpgradeArgs>> for State {
     fn version(&self) -> u32 {
         // 每个版本的版本号
         match self {
@@ -62,17 +119,9 @@ impl Upgrade for State {
             }
         }
     }
-
-    fn upgrade(&mut self) {
-        'outer: loop {
-            // 进行升级操作, 不断地升到下一版本
-            match self {
-                V0(s) => *self = V1(std::mem::take(&mut *s).into()), // -> V1
-                V1(_) => break 'outer,                               // same version do nothing
-            }
-        }
-    }
 }
+
+// ================== get ==================
 
 impl State {
     pub fn get(&self) -> &dyn Business {
@@ -89,26 +138,16 @@ impl State {
     }
 }
 
-// ==================== 初始化 ====================
-
-// 罐子初始化需要的参数
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-pub struct CanisterInitialArg {
-    schedule: Option<DurationNanos>,
+// ================== 权限 ==================
+// 本罐子需要的权限转换
+pub trait ParsePermission {
+    fn parse_permission<'a>(&self, name: &'a str) -> Result<Permission, ParsePermissionError<'a>>;
 }
-impl CanisterInitialArg {
-    pub fn none() -> Self {
-        CanisterInitialArg { schedule: None }
+#[derive(Debug, Clone, Serialize, CandidType)]
+pub struct ParsePermissionError<'a>(&'a str);
+impl Display for ParsePermissionError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ParsePermissionError: {}", self.0)
     }
 }
-
-// 初始化
-impl Initial<CanisterInitialArg> for State {
-    fn init(&mut self, arg: CanisterInitialArg) {
-        self.upgrade(); // 再判断升级一次也没关系
-        match self {
-            V0(s) => s.init(arg), // * 初始化
-            V1(s) => s.init(arg), // * 初始化
-        }
-    }
-}
+impl std::error::Error for ParsePermissionError<'_> {}

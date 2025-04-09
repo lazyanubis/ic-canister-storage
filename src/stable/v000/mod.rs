@@ -1,8 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use ic_canister_kit::{identity::caller, types::*};
-
-use super::CanisterInitialArg;
+use ic_canister_kit::{functions::permission::basic::supers_updated, identity::caller, types::*};
 
 pub mod types;
 
@@ -17,34 +15,54 @@ mod business;
 use types::*;
 
 // 初始化
-// ! 1. 第一次部署会执行
-// ! 2. 升级到本版本后也会执行, 要注意不要破坏了原先的数据信息
-impl Initial<CanisterInitialArg> for InnerState {
-    fn init(&mut self, arg: CanisterInitialArg) {
-        // 权限初始化
-        let caller = caller();
-        let permissions: HashSet<Permission> = ACTIONS
-            .into_iter()
-            .map(|name| {
-                #[allow(clippy::unwrap_used)] // ? SAFETY
-                self.parse_permission(name).unwrap()
-            })
-            .collect();
-        // 调用者赋予所有权限
-        let updated: Vec<PermissionUpdatedArg<Permission>> =
-            vec![PermissionUpdatedArg::UpdateUserPermission(
-                caller,
-                Some(
-                    permissions
-                        .iter()
-                        .filter(|p| p.is_permit())
-                        .cloned()
-                        .collect(),
-                ),
-            )];
+// ! 第一次部署会执行
+impl Initial<Option<Box<InitArg>>> for InnerState {
+    fn init(&mut self, arg: Option<Box<InitArg>>) {
+        let arg = arg.unwrap_or_default(); // ! 就算是 None，也要执行一次
 
-        self.permission_reset(permissions); // 刷新权限
-        let _ = self.permission_update(updated); // 插入权限
+        // 超级管理员初始化
+        let supers = arg.supers.unwrap_or_else(|| {
+            vec![caller()] // 默认调用者为超级管理员
+        });
+
+        let permissions = get_all_permissions(|n| self.parse_permission(n));
+        let updated = supers_updated(&supers, &permissions);
+
+        // 刷新权限
+        self.permission_reset(permissions);
+        // 超级管理员赋予所有权限
+        #[allow(clippy::unwrap_used)] // ? SAFETY
+        self.permission_update(updated).unwrap(); // 插入权限
+
+        // 定时任务
+        self.schedule_replace(arg.schedule);
+    }
+}
+
+// 升级
+// ! 升级时执行
+impl Upgrade<Option<Box<UpgradeArg>>> for InnerState {
+    fn upgrade(&mut self, arg: Option<Box<UpgradeArg>>) {
+        let arg = match arg {
+            Some(arg) => arg,
+            None => return, // ! None 表示升级无需处理数据
+        };
+
+        // 超级管理员初始化
+        let supers = arg.supers;
+
+        let permissions = get_all_permissions(|n| self.parse_permission(n));
+        let updated = supers
+            .as_ref()
+            .map(|supers| supers_updated(supers, &permissions));
+
+        // 刷新权限
+        self.permission_reset(permissions);
+        // 超级管理员赋予所有权限
+        if let Some(updated) = updated {
+            #[allow(clippy::unwrap_used)] // ? SAFETY
+            self.permission_update(updated).unwrap(); // 插入权限
+        }
 
         // 定时任务
         self.schedule_replace(arg.schedule);
