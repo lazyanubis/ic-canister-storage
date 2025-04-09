@@ -332,9 +332,9 @@ dependencies = [
 
 [[package]]
 name = "ic-canister-kit"
-version = "1.0.27"
+version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60e7d9c4bdbfd3564daac7e9f1bcb75f5f1987009c703a88f8022d5769ea4155"
+checksum = "8148e937df85d1d2e30b401aa1a017034f653d013bced0b7e14b9d24e6bb69ef"
 dependencies = [
  "candid",
  "ciborium",

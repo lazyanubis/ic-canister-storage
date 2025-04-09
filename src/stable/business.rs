@@ -1,3 +1,4 @@
+#[allow(unused)]
 use super::*;
 #[allow(unused)]
 pub use ic_canister_kit::identity::self_canister_id;
