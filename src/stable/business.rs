@@ -9,7 +9,6 @@ pub use std::collections::{HashMap, HashSet};
 #[allow(unused)]
 pub use std::fmt::Display;
 
-#[allow(clippy::panic)] // ? SAFETY
 #[allow(unused_variables)]
 pub trait Business:
     Pausable<PauseReason>

@@ -24,7 +24,7 @@ pub fn wallet_receive() -> candid::Nat {
 
 #[ic_cdk::update]
 async fn canister_status() -> ic_cdk::api::management_canister::main::CanisterStatusResponse {
-    #[allow(clippy::unwrap_used)]
+    #[allow(clippy::unwrap_used)] // ? SAFETY
     ic_canister_kit::canister::status::canister_status(ic_canister_kit::identity::self_canister_id()).await.unwrap()
 }
 

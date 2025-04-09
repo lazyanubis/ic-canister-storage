@@ -46,12 +46,7 @@ impl Initial<Option<InitArgs>> for State {
                 (V0(s), InitArgs::V0(arg)) => s.init(Some(arg)),
                 (V1(s), InitArgs::V1(arg)) => s.init(Some(arg)),
                 // ! 👆👆 新增版本需要添加默认的数据
-                _ => {
-                    #[allow(clippy::panic)] // ? SAFETY
-                    {
-                        panic!("version mismatched")
-                    }
-                }
+                _ => ic_cdk::trap("version mismatched"),
             },
             None => match self {
                 V0(s) => s.init(None),
@@ -79,12 +74,7 @@ impl Upgrade<Option<UpgradeArgs>> for State {
                     (V0(s), UpgradeArgs::V0(arg)) => s.upgrade(Some(arg)),
                     (V1(s), UpgradeArgs::V1(arg)) => s.upgrade(Some(arg)),
                     // ! 👆👆 新增版本需要添加默认的数据
-                    _ => {
-                        #[allow(clippy::panic)] // ? SAFETY
-                        {
-                            panic!("version mismatched")
-                        }
-                    }
+                    _ => ic_cdk::trap("version mismatched"),
                 }
             }
             None => match self {
@@ -110,12 +100,7 @@ impl StateUpgrade<Option<UpgradeArgs>> for State {
             0 => V0(Box::default()), // * 初始化
             1 => V1(Box::default()), // * 初始化
             // ! 👆👆 新增版本需要添加默认的数据
-            _ => {
-                #[allow(clippy::panic)] // ? SAFETY
-                {
-                    panic!("unsupported version")
-                }
-            }
+            _ => ic_cdk::trap("unsupported version"),
         }
     }
 }
