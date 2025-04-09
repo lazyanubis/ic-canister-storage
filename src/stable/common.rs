@@ -24,13 +24,10 @@ pub fn check_permission(
 ) -> Result<(), String> {
     let caller = ic_canister_kit::identity::caller();
     with_state(|s| {
-        if s.permission_has(&caller, &{
-            #[allow(clippy::unwrap_used)] // ? SAFETY
-            s.parse_permission(permission).unwrap()
-        }) {
+        let _permission = s.parse_permission(permission).map_err(|e| e.to_string())?;
+        if s.permission_has(&caller, &_permission) {
             if running {
-                #[allow(clippy::unwrap_used)] // ? SAFETY
-                s.pause_must_be_running().unwrap();
+                s.pause_must_be_running()?;
             }
             return Ok(());
         }
