@@ -16,8 +16,8 @@ use types::*;
 
 // 初始化
 // ! 第一次部署会执行
-impl Initial<Option<Box<InitArg>>> for InnerState {
-    fn init(&mut self, arg: Option<Box<InitArg>>) {
+impl Initial<Option<InitArg>> for InnerState {
+    fn init(&mut self, arg: Option<InitArg>) {
         let arg = arg.unwrap_or_default(); // ! 就算是 None，也要执行一次
 
         // 超级管理员初始化
@@ -40,8 +40,8 @@ impl Initial<Option<Box<InitArg>>> for InnerState {
 
 // 升级
 // ! 升级时执行
-impl Upgrade<Option<Box<UpgradeArg>>> for InnerState {
-    fn upgrade(&mut self, arg: Option<Box<UpgradeArg>>) {
+impl Upgrade<Option<UpgradeArg>> for InnerState {
+    fn upgrade(&mut self, arg: Option<UpgradeArg>) {
         let arg = match arg {
             Some(arg) => arg,
             None => return, // ! None 表示升级无需处理数据
