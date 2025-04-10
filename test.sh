@@ -22,7 +22,7 @@ function canister_id {
 
 function check {
     if [ -n "$3" ]; then
-        if [[ $(echo $2 | grep "$3") != "" ]]; then
+        if [[ $(echo $2 | grep -F "$3") != "" ]]; then
             green "✅ Passed: $1 -> $2 -> $3"
         else
             red "❌ Failed: $1"
