@@ -20,15 +20,35 @@ function canister_id {
     echo $(dfx canister id $1)
 }
 
+find_string_position() {
+    local haystack="$1"
+    local needle="$2"
+    local needle_length=${#needle}
+    local haystack_length=${#haystack}
+    local i
+    for ((i = 0; i <= haystack_length - needle_length; i++)); do
+        local substring="${haystack:i:needle_length}"
+        if [[ "$substring" == "$needle" ]]; then
+            echo $((i + 1))
+            return
+        fi
+    done
+    echo -1
+}
+
 function check {
     if [ -n "$3" ]; then
         if [[ $(echo $2 | grep -F "$3") != "" ]]; then
             green "✅ Passed: $1 -> $2 -> $3"
         else
+            FILE=$(echo "$5" | cut -d' ' -f3)
+            LINE_NUMBER=$(echo "$5" | cut -d' ' -f1)
+            LINE=$(sed -n "${LINE_NUMBER}p" "$FILE")
+            COL_NUMBER=$(find_string_position "$LINE" "$3")
             red "❌ Failed: $1"
             green "Expected: $3"
             yellow "     Got: $2"
-            red "Line: ./test.sh:$5 👉 $4"
+            red "Line: $FILE:$LINE_NUMBER:$COL_NUMBER 👉 $4"
             exit 1
         fi
     fi
