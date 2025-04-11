@@ -21,7 +21,7 @@ impl Initial<Option<InitArg>> for InnerState {
         let arg = arg.unwrap_or_default(); // ! 就算是 None，也要执行一次
 
         // 超级管理员初始化
-        let supers = arg.supers.unwrap_or_else(|| {
+        let supers = arg.supers.clone().unwrap_or_else(|| {
             vec![caller()] // 默认调用者为超级管理员
         });
 
@@ -35,6 +35,9 @@ impl Initial<Option<InitArg>> for InnerState {
 
         // 定时任务
         self.schedule_replace(arg.schedule);
+
+        // 业务数据
+        self.do_init(arg);
     }
 }
 
@@ -48,7 +51,7 @@ impl Upgrade<Option<UpgradeArg>> for InnerState {
         };
 
         // 超级管理员初始化
-        let supers = arg.supers;
+        let supers = arg.supers.clone();
 
         let permissions = get_all_permissions(|n| self.parse_permission(n));
         let updated = supers
@@ -64,6 +67,9 @@ impl Upgrade<Option<UpgradeArg>> for InnerState {
 
         // 定时任务
         self.schedule_replace(arg.schedule);
+
+        // 业务数据
+        self.do_upgrade(arg);
     }
 }
 
