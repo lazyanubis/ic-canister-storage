@@ -283,6 +283,14 @@ pub struct QueryFile {
 }
 
 impl InnerState {
+    pub fn do_init(&mut self, _arg: InitArg) {
+        // maybe do something
+    }
+
+    pub fn do_upgrade(&mut self, _arg: UpgradeArg) {
+        // maybe do something
+    }
+
     fn hash(file: &UploadingFile) -> HashDigest {
         use sha2::Digest;
         let mut hasher = sha2::Sha256::new();
@@ -514,15 +522,5 @@ impl InnerState {
     }
     pub fn clean_uploading(&mut self, path: &String) {
         self.files.remove(path);
-    }
-}
-
-impl InnerState {
-    pub fn do_init(&mut self, _arg: InitArg) {
-        // maybe do something
-    }
-
-    pub fn do_upgrade(&mut self, _arg: UpgradeArg) {
-        // maybe do something
     }
 }
