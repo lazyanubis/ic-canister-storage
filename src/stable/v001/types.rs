@@ -188,3 +188,13 @@ impl Storable for ExampleVec {
         is_fixed_size: true,
     };
 }
+
+impl InnerState {
+    pub fn do_init(&mut self, _arg: InitArg) {
+        // maybe do something
+    }
+
+    pub fn do_upgrade(&mut self, _arg: UpgradeArg) {
+        // maybe do something
+    }
+}
