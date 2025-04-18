@@ -157,7 +157,7 @@ impl ScheduleTask for InnerState {}
 
 impl StableHeap for InnerState {
     fn heap_to_bytes(&self) -> Vec<u8> {
-        let bytes = ic_canister_kit::functions::stable::to_bytes(&self);
+        let bytes = ic_canister_kit::functions::stable::to_bytes(self);
         ic_canister_kit::common::trap(bytes)
     }
 
