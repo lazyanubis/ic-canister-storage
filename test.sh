@@ -7,6 +7,7 @@ dfx stop
 trap 'say test over && dfx stop' EXIT
 
 dfx start --background --clean # 开启新的 dfx 环境
+# dfx start --artificial-delay 0 --background --clean # 开启新的 dfx 环境
 # dfx start --background --clean >/dev/null 2>&1 # 开启新的 dfx 环境
 
 function red { echo "\033[31m$1\033[0m"; }
