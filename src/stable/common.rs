@@ -52,7 +52,7 @@ fn initial(args: Option<InitArgs>) {
             format!("Initial by {}", caller().to_text()),
         );
         s.upgrade(None); // upgrade to latest version
-        s.init(args); // ! 初始化最新版本 
+        s.init(args); // ! 初始化最新版本
         s.schedule_reload(); // * 重置定时任务
         s.record_update(record_id, format!("Version: {}", s.version()));
     })
