@@ -1,0 +1,55 @@
+//! https://github.com/dfinity/pocketic
+use candid::{Principal, encode_one};
+use pocket_ic::PocketIc;
+
+mod service;
+
+// 2T cycles
+const INIT_CYCLES: u128 = 2_000_000_000_000;
+
+const WASM_MODULE: &[u8] = include_bytes!("../sources/source_opt.wasm");
+
+#[ignore]
+#[test]
+#[rustfmt::skip]
+fn test_business_apis() {
+    let pic = PocketIc::new();
+
+    let default_identity = Principal::from_text("2ibo7-dia").unwrap();
+    let alice_identity = Principal::from_text("uuc56-gyb").unwrap();
+    let bob_identity = Principal::from_text("hqgi5-iic").unwrap(); // cspell: disable-line
+    let carol_identity = Principal::from_text("jmf34-nyd").unwrap();
+    let anonymous_identity = Principal::from_text("2vxsx-fae").unwrap();
+
+    let template = Principal::from_text("lxzze-o7777-77777-aaaaa-cai").unwrap();
+
+    pic.create_canister_with_id(Some(default_identity), None, template).unwrap();
+    pic.add_cycles(template, INIT_CYCLES);
+
+    pic.install_canister(template, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
+
+    use service::*;
+
+    let pocketed_template = PocketedCanisterId::new(template, &pic);
+    #[allow(unused)] let default = pocketed_template.sender(default_identity);
+    #[allow(unused)] let alice = pocketed_template.sender(alice_identity);
+    #[allow(unused)] let bob = pocketed_template.sender(bob_identity);
+    #[allow(unused)] let carol = pocketed_template.sender(carol_identity);
+    #[allow(unused)] let anonymous = pocketed_template.sender(anonymous_identity);
+
+    // 🚩 5 example business
+    assert_eq!(alice.business_example_query().unwrap(), "".to_string());
+    assert_eq!(default.business_example_query().unwrap(), "".to_string());
+    assert_eq!(alice.business_example_set("test string".to_string()).unwrap_err().reject_message, "Permission 'BusinessExampleSet' is required".to_string());
+    assert_eq!(default.business_example_set("test string".to_string()).unwrap(), ());
+    assert_eq!(alice.business_example_query().unwrap(), "test string".to_string());
+    assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
+
+    // 🚩 6 test stable data
+    assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
+    assert_eq!(default.pause_query().unwrap(), true);
+    pic.upgrade_canister(template, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
+    assert_eq!(default.pause_replace(None).unwrap(), ());
+    assert_eq!(default.pause_query().unwrap(), false);
+    assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
+}
