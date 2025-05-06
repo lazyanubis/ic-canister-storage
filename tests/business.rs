@@ -37,7 +37,7 @@ fn test_business_apis() {
     #[allow(unused)] let carol = pocketed_template.sender(carol_identity);
     #[allow(unused)] let anonymous = pocketed_template.sender(anonymous_identity);
 
-    // 🚩 5 example business
+    // 🚩 1 example business
     assert_eq!(alice.business_example_query().unwrap(), "".to_string());
     assert_eq!(default.business_example_query().unwrap(), "".to_string());
     assert_eq!(alice.business_example_set("test string".to_string()).unwrap_err().reject_message, "Permission 'BusinessExampleSet' is required".to_string());
@@ -45,7 +45,7 @@ fn test_business_apis() {
     assert_eq!(alice.business_example_query().unwrap(), "test string".to_string());
     assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
 
-    // 🚩 6 test stable data
+    // 🚩 2 test stable data
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
     assert_eq!(default.pause_query().unwrap(), true);
     pic.upgrade_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
