@@ -21,17 +21,17 @@ fn test_common_apis() {
     let carol_identity = Principal::from_text("jmf34-nyd").unwrap();
     let anonymous_identity = Principal::from_text("2vxsx-fae").unwrap();
 
-    let template = Principal::from_text("lxzze-o7777-77777-aaaaa-cai").unwrap();
+    let canister_id = Principal::from_text("lxzze-o7777-77777-aaaaa-cai").unwrap();
 
-    pic.create_canister_with_id(Some(default_identity), None, template).unwrap();
-    pic.add_cycles(template, INIT_CYCLES);
+    pic.create_canister_with_id(Some(default_identity), None, canister_id).unwrap();
+    pic.add_cycles(canister_id, INIT_CYCLES);
 
-    pic.install_canister(template, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
+    pic.install_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
 
     use service::*;
     use Permission::*;
 
-    let pocketed_template = PocketedCanisterId::new(template, &pic);
+    let pocketed_template = PocketedCanisterId::new(canister_id, &pic);
     #[allow(unused)] let default = pocketed_template.sender(default_identity);
     #[allow(unused)] let alice = pocketed_template.sender(alice_identity);
     #[allow(unused)] let bob = pocketed_template.sender(bob_identity);
