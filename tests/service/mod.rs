@@ -180,14 +180,11 @@ impl Service<'_> {
         let result = Decode!(response.as_slice(), R).unwrap();
         Ok(result)
     }
+
+    // ======================= common apis =======================
+
     pub fn get_candid_interface_tmp_hack(&self) -> Result<String> {
         self.query_call("__get_candid_interface_tmp_hack", Encode!(&()).unwrap())
-    }
-    pub fn business_example_query(&self) -> Result<String> {
-        self.query_call("business_example_query", Encode!(&()).unwrap())
-    }
-    pub fn business_example_set(&self, arg0: String) -> Result<()> {
-        self.update_call("business_example_set", encode_one(&arg0).unwrap())
     }
     pub fn canister_status(&self) -> Result<CanisterStatusResult> {
         self.update_call("canister_status", Encode!(&()).unwrap())
@@ -257,5 +254,14 @@ impl Service<'_> {
     }
     pub fn whoami(&self) -> Result<Principal> {
         self.query_call("whoami", Encode!(&()).unwrap())
+    }
+
+    // ======================= business apis =======================
+
+    pub fn business_example_query(&self) -> Result<String> {
+        self.query_call("business_example_query", Encode!(&()).unwrap())
+    }
+    pub fn business_example_set(&self, arg0: String) -> Result<()> {
+        self.update_call("business_example_set", encode_one(&arg0).unwrap())
     }
 }
