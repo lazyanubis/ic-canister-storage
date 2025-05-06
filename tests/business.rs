@@ -30,12 +30,12 @@ fn test_business_apis() {
 
     use service::*;
 
-    let pocketed_template = PocketedCanisterId::new(canister_id, &pic);
-    #[allow(unused)] let default = pocketed_template.sender(default_identity);
-    #[allow(unused)] let alice = pocketed_template.sender(alice_identity);
-    #[allow(unused)] let bob = pocketed_template.sender(bob_identity);
-    #[allow(unused)] let carol = pocketed_template.sender(carol_identity);
-    #[allow(unused)] let anonymous = pocketed_template.sender(anonymous_identity);
+    let pocketed_canister_id = PocketedCanisterId::new(canister_id, &pic);
+    #[allow(unused)] let default = pocketed_canister_id.sender(default_identity);
+    #[allow(unused)] let alice = pocketed_canister_id.sender(alice_identity);
+    #[allow(unused)] let bob = pocketed_canister_id.sender(bob_identity);
+    #[allow(unused)] let carol = pocketed_canister_id.sender(carol_identity);
+    #[allow(unused)] let anonymous = pocketed_canister_id.sender(anonymous_identity);
 
     // 🚩 1 example business
     assert_eq!(alice.business_example_query().unwrap(), "".to_string());
