@@ -21,14 +21,14 @@ pub use super::schedule::schedule_task;
 // 初始化参数
 #[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType, Default)]
 pub struct InitArg {
-    pub supers: Option<Vec<UserId>>, // init super administrators or deployer
+    pub supers: Option<Vec<UserId>>,     // init super administrators or deployer
     pub schedule: Option<DurationNanos>, // init scheduled task or not
 }
 
 // 升级参数
 #[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType)]
 pub struct UpgradeArg {
-    pub supers: Option<Vec<UserId>>, // add new super administrators of not
+    pub supers: Option<Vec<UserId>>,     // add new super administrators of not
     pub schedule: Option<DurationNanos>, // init scheduled task or not
 }
 
@@ -120,9 +120,7 @@ fn init_assets_data() -> StableBTreeMap<SliceOfHashDigest, Vec<u8>> {
 
 pub type SliceOfHashDigest = [u8; 4 + 32];
 
-#[derive(
-    CandidType, Serialize, Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord,
-)]
+#[derive(CandidType, Serialize, Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HashDigest([u8; 32]);
 
 impl HashDigest {
@@ -177,7 +175,7 @@ mod assets {
                 let offset = offset as usize;
                 let size = size as usize;
                 let data = data[offset..offset + size].to_vec();
-                ic_cdk::spawn(async move {
+                ic_cdk::futures::spawn(async move {
                     let mut assets = init_assets_data();
                     assets.insert(key, data);
                 });
@@ -298,13 +296,7 @@ impl InnerState {
         let digest: [u8; 32] = hasher.finalize().into();
         HashDigest(digest)
     }
-    fn put_file(
-        &mut self,
-        path: String,
-        headers: Vec<(String, String)>,
-        hash: HashDigest,
-        size: u64,
-    ) {
+    fn put_file(&mut self, path: String, headers: Vec<(String, String)>, hash: HashDigest, size: u64) {
         // 3. 插入 files: path -> hash
         let now = ic_canister_kit::times::now();
         if let Some(exist) = self.files.get_mut(&path) {
@@ -381,9 +373,7 @@ impl InnerState {
         use ic_canister_kit::common::trap;
         let file = trap(self.files.get(&path).ok_or("File not found"));
         let asset = trap(self.assets.get(&file.hash).ok_or("File not found"));
-        asset
-            .slice(&file.hash, file.size, 0, file.size as usize)
-            .to_vec()
+        asset.slice(&file.hash, file.size, 0, file.size as usize).to_vec()
     }
     pub fn download_by(&self, path: String, offset: u64, size: u64) -> Vec<u8> {
         use ic_canister_kit::common::trap;
@@ -435,10 +425,7 @@ impl InnerState {
         // 6. 检查 data
         if arg.index < chunks - 1 || arg.size == arg.chunk_size as u64 * chunks as u64 {
             // 是前面完整的 或者 整好整除
-            assert!(
-                arg.chunk.len() as u32 == arg.chunk_size,
-                "wrong chunk length"
-            );
+            assert!(arg.chunk.len() as u32 == arg.chunk_size, "wrong chunk length");
         } else {
             // 是剩下的
             assert!(

@@ -24,7 +24,8 @@ fn __get_candid_interface_tmp_hack() -> String {
 
 /// 测试方法 打印输出 candid 文件内容
 /// 执行代码
-/// `cargo test update_candid -- --nocapture`
+/// `cargo test update_candid -- --ignored --nocapture`
+#[ignore]
 #[test]
 fn update_candid() {
     #[allow(unused_imports)]

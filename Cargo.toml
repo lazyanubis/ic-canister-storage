@@ -34,13 +34,13 @@ codegen-units = 1 # 指定一个包会被分隔为多少个代码生成单元。
 # Candid crate 是 Candid 的序列化/反序列化库。您可以在 Rust 值和 Candid 之间以二进制和文本格式无缝转换。
 candid = "0.10.13"
 # IC Canister开发工具包
-ic-cdk = "0.17.1"
+ic-cdk = "0.18.0"
 # ic-certified-map = "0.4.0" # 可信验证
 
 serde = { version = "1.0.219", features = ["derive"] } # 序列化/反序列化框架
 serde_json = "1.0.140"                                 # json
 
-ic-canister-kit = { version = "1.0.37", features = [
+ic-canister-kit = { version = "1.1.0", features = [
     "identity",
     "canister",
     "http",
@@ -56,4 +56,8 @@ sha2 = "0.10"            # hash
 hex = "0.4"
 percent-encoding = "2.2" # 网络模块 解析请求
 regex = "1.11.1"         # 网络模块 解析请求
-# chrono = "0.4.26"          # ! 网络模块 解析时间 无法编译
+chrono = "0.4.26"        # 时间工具
+
+[dev-dependencies]
+pocket-ic = "9.0.0"
+serde_bytes = "0.11.17"

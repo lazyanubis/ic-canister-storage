@@ -12,8 +12,8 @@ use super::types::{InnerState, ParsePermission};
 // 通用权限
 pub use super::super::v000::types::{
     ACTION_PAUSE_QUERY, ACTION_PAUSE_REPLACE, ACTION_PERMISSION_FIND, ACTION_PERMISSION_QUERY,
-    ACTION_PERMISSION_UPDATE, ACTION_RECORD_FIND, ACTION_RECORD_MIGRATE, ACTION_SCHEDULE_FIND,
-    ACTION_SCHEDULE_REPLACE, ACTION_SCHEDULE_TRIGGER,
+    ACTION_PERMISSION_UPDATE, ACTION_RECORD_FIND, ACTION_RECORD_MIGRATE, ACTION_SCHEDULE_FIND, ACTION_SCHEDULE_REPLACE,
+    ACTION_SCHEDULE_TRIGGER,
 };
 
 // 业务权限
@@ -79,9 +79,8 @@ impl ParsePermission for InnerState {
 // 通用权限
 #[allow(unused)]
 pub use super::super::v000::types::{
-    has_pause_query, has_pause_replace, has_permission_find, has_permission_query,
-    has_permission_update, has_record_find, has_record_migrate, has_schedule_find,
-    has_schedule_replace, has_schedule_trigger,
+    has_pause_query, has_pause_replace, has_permission_find, has_permission_query, has_permission_update,
+    has_record_find, has_record_migrate, has_schedule_find, has_schedule_replace, has_schedule_trigger,
 };
 
 // 业务权限

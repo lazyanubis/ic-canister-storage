@@ -28,9 +28,7 @@ fn inner_http_request(state: &State, req: CustomHttpRequest) -> CustomHttpRespon
     let request_headers = req.headers;
 
     let path = split_url.next().unwrap_or("/"); // 分割出 url，默认是 /
-    let path = percent_decode_str(path)
-        .decode_utf8()
-        .unwrap_or(Cow::Borrowed(path));
+    let path = percent_decode_str(path).decode_utf8().unwrap_or(Cow::Borrowed(path));
     let params = split_url.next().unwrap_or(""); // 请求参数
     let params = percent_decode_str(params)
         .decode_utf8()
@@ -54,15 +52,8 @@ fn inner_http_request(state: &State, req: CustomHttpRequest) -> CustomHttpRespon
         if let Some(file) = file {
             let asset = state.business_assets_get(&file.hash);
             if let Some(asset) = asset {
-                let (_body, _streaming_strategy): (Vec<u8>, Option<StreamingStrategy>) = toast(
-                    &path,
-                    &params,
-                    &request_headers,
-                    file,
-                    asset,
-                    &mut code,
-                    &mut headers,
-                ); // 有对应的文件
+                let (_body, _streaming_strategy): (Vec<u8>, Option<StreamingStrategy>) =
+                    toast(&path, &params, &request_headers, file, asset, &mut code, &mut headers); // 有对应的文件
                 body = _body;
                 streaming_strategy = _streaming_strategy;
             } else {
@@ -96,8 +87,7 @@ fn toast<'a>(
     headers: &mut HashMap<&'a str, Cow<'a, str>>,
 ) -> (Vec<u8>, Option<StreamingStrategy>) {
     // 1. 设置 header
-    let (offset, size, streaming_strategy) =
-        set_headers(path, params, request_headers, file, code, headers);
+    let (offset, size, streaming_strategy) = set_headers(path, params, request_headers, file, code, headers);
 
     // 2. 返回指定的内容
     (
@@ -131,10 +121,7 @@ fn set_headers<'a>(
     // 文件名下载
     if let Ok(reg) = Regex::new(r"attachment=(.*\..*)?(&.*)?$") {
         for cap in reg.captures_iter(params) {
-            let mut file_name = cap
-                .get(1)
-                .map(|m| &params[m.start()..m.end()])
-                .unwrap_or("");
+            let mut file_name = cap.get(1).map(|m| &params[m.start()..m.end()]).unwrap_or("");
             if file_name.is_empty() {
                 file_name = file.path.split('/').next_back().unwrap_or_default();
             }
@@ -255,7 +242,7 @@ fn not_found<'a>(code: &mut u16, headers: &mut HashMap<&'a str, Cow<'a, str>>) -
 #[inline]
 fn to_streaming_strategy(path: String, offset: u64, offset_end: u64) -> StreamingStrategy {
     StreamingStrategy::Callback {
-        callback: HttpRequestStreamingCallback::new(ic_cdk::id(), "http_streaming".into()),
+        callback: HttpRequestStreamingCallback::new(ic_cdk::api::canister_self(), "http_streaming".into()),
         token: to_streaming_token(path, offset, offset_end),
     }
 }
@@ -323,8 +310,7 @@ fn http_streaming(token: StreamingCallbackToken) -> StreamingCallbackHttpRespons
                     body: asset
                         .slice(&file.hash, file.size, offset, streaming_end - offset)
                         .to_vec(),
-                    token: ((streaming_end as u64) < end)
-                        .then(|| to_streaming_token(path, streaming_end as u64, end)),
+                    token: ((streaming_end as u64) < end).then(|| to_streaming_token(path, streaming_end as u64, end)),
                 };
             }
         }

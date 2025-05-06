@@ -3,7 +3,7 @@
         "storage": {
             "type": "custom",
             "build": [
-                "cargo test -p storage update_candid -- --nocapture",
+                "cargo test -p storage update_candid -- --ignored --nocapture",
                 "cargo build --target wasm32-unknown-unknown --release",
                 "ic-wasm target/wasm32-unknown-unknown/release/storage.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public",
                 "ic-wasm sources/source_opt.wasm -o sources/source_opt.wasm shrink"
