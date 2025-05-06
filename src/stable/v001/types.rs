@@ -21,14 +21,14 @@ pub use super::schedule::schedule_task;
 // 初始化参数
 #[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType, Default)]
 pub struct InitArg {
-    pub supers: Option<Vec<UserId>>, // init super administrators or deployer
+    pub supers: Option<Vec<UserId>>,     // init super administrators or deployer
     pub schedule: Option<DurationNanos>, // init scheduled task or not
 }
 
 // 升级参数
 #[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType)]
 pub struct UpgradeArg {
-    pub supers: Option<Vec<UserId>>, // add new super administrators of not
+    pub supers: Option<Vec<UserId>>,     // add new super administrators of not
     pub schedule: Option<DurationNanos>, // init scheduled task or not
 }
 

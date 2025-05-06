@@ -54,9 +54,7 @@ impl Upgrade<Option<UpgradeArg>> for InnerState {
         let supers = arg.supers.clone();
 
         let permissions = get_all_permissions(|n| self.parse_permission(n));
-        let updated = supers
-            .as_ref()
-            .map(|supers| supers_updated(supers, &permissions));
+        let updated = supers.as_ref().map(|supers| supers_updated(supers, &permissions));
 
         // 刷新权限
         self.permission_reset(permissions);
@@ -102,9 +100,7 @@ impl Permissable<Permission> for InnerState {
         self.canister_kit.permissions.permission_user_roles(user_id)
     }
     fn permission_has(&self, user_id: &UserId, permission: &Permission) -> bool {
-        self.canister_kit
-            .permissions
-            .permission_has(user_id, permission)
+        self.canister_kit.permissions.permission_has(user_id, permission)
     }
     fn permission_owned(&self, user_id: &UserId) -> HashMap<&Permission, bool> {
         self.canister_kit.permissions.permission_owned(user_id)
@@ -129,9 +125,7 @@ impl Recordable<Record, RecordTopic, RecordSearch> for InnerState {
     }
     // 修改
     fn record_push(&mut self, caller: CallerId, topic: RecordTopic, content: String) -> RecordId {
-        self.canister_kit
-            .records
-            .record_push(caller, topic, content)
+        self.canister_kit.records.record_push(caller, topic, content)
     }
     fn record_update(&mut self, record_id: RecordId, done: String) {
         self.canister_kit.records.record_update(record_id, done)

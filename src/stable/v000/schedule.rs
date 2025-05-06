@@ -8,10 +8,7 @@ use super::types::*;
 #[allow(unused_variables)]
 pub async fn schedule_task(record_by: Option<CallerId>) {
     // * 记录
-    let record_id = with_record_push(
-        super::types::RecordTopics::Schedule.topic(),
-        String::with_capacity(0),
-    );
+    let record_id = with_record_push(super::types::RecordTopics::Schedule.topic(), String::with_capacity(0));
 
     // 如果有定时任务
     ic_cdk::println!(
