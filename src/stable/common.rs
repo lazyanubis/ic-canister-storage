@@ -38,7 +38,7 @@ pub fn check_permission(
 // ================= 需要持久化的数据 ================
 
 thread_local! {
-    static STATE: RefCell<State> = RefCell::default();// 存储系统数据
+    static STATE: RefCell<State> = RefCell::default(); // 存储系统数据
 }
 
 // ==================== 初始化方法 ====================
@@ -270,7 +270,7 @@ fn static_schedule_task() {
         return; // 维护中不允许执行任务
     }
 
-    ic_cdk::spawn(async move { schedule_task(None).await });
+    ic_cdk::futures::spawn(async move { schedule_task(None).await });
 }
 
 pub trait ScheduleTask: Schedulable {
