@@ -4,9 +4,7 @@ use std::collections::{HashMap, HashSet};
 use ic_canister_kit::identity::caller;
 use ic_canister_kit::types::*;
 
-use super::{
-    InitArgs, ParsePermission, ParsePermissionError, RecordTopics, UpgradeArgs, schedule_task,
-};
+use super::{InitArgs, ParsePermission, ParsePermissionError, RecordTopics, UpgradeArgs, schedule_task};
 use super::{State, State::*};
 
 // 默认值

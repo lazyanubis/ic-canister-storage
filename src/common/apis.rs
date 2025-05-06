@@ -134,9 +134,7 @@ fn permission_roles_all() -> HashMap<String, HashSet<Permission>> {
             .map(|role| {
                 (
                     role.to_owned(),
-                    s.permission_role_assigned(role)
-                        .cloned()
-                        .unwrap_or_default(),
+                    s.permission_role_assigned(role).cloned().unwrap_or_default(),
                 )
             })
             .collect()
@@ -161,10 +159,7 @@ fn permission_update(args: Vec<PermissionUpdatedArg<String>>) {
     let caller = caller();
     let arg_content = format!(
         "permission update: [{}]",
-        args.iter()
-            .map(|a| a.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
+        args.iter().map(|a| a.to_string()).collect::<Vec<String>>().join(", ")
     ); // * 记录参数内容
 
     with_mut_state(
@@ -199,10 +194,7 @@ fn record_find_by_page(page: QueryPage, search: Option<RecordSearchArg>) -> Page
         .map(|s| s.into(|t| RecordTopics::from(t).map(|t| t.topic())))
         .transpose();
     let search = trap(search);
-    let result = with_state(|s| {
-        s.record_find_by_page(&page, 1000, &search)
-            .map(|p| p.into())
-    });
+    let result = with_state(|s| s.record_find_by_page(&page, 1000, &search).map(|p| p.into()));
     trap(result)
 }
 
