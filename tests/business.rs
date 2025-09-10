@@ -45,6 +45,15 @@ fn test_business_apis() {
     assert_eq!(alice.business_example_query().unwrap(), "test string".to_string());
     assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
 
+    // 🚩 1.2 example business
+    assert_eq!(default.business_example_count_query().unwrap(), 0);
+    assert_eq!(default.business_example_count_set(1).unwrap(), ());
+    assert_eq!(default.business_example_count_query().unwrap(), 1);
+    assert_eq!(default.business_example_count_set2(2).unwrap_err().reject_message.contains("test2 panic"), true);
+    assert_eq!(default.business_example_count_query().unwrap(), 1);
+    assert_eq!(default.business_example_count_set3(3).unwrap_err().reject_message.contains("test3 panic"), true);
+    assert_eq!(default.business_example_count_query().unwrap(), 1);
+
     // 🚩 2 test stable data
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
     assert_eq!(default.pause_query().unwrap(), true);

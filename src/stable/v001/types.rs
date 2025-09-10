@@ -80,6 +80,7 @@ pub struct InnerState {
 
     // 业务数据
     pub example_data: String, // 样例数据 // ? 堆内存 序列化
+    pub example_count: u64,   // 样例数据 // ? 堆内存 序列化
 }
 
 impl Default for InnerState {
@@ -90,6 +91,7 @@ impl Default for InnerState {
 
             // 业务数据
             example_data: Default::default(),
+            example_count: Default::default(),
         }
     }
 }

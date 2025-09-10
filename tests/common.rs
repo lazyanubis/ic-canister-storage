@@ -104,9 +104,9 @@ fn test_common_apis() {
     assert_eq!(default.schedule_find().unwrap(), None);
     assert_eq!(alice.schedule_replace(Some(1000000000)).unwrap_err().reject_message, "Permission 'ScheduleReplace' is required".to_string());
     assert_eq!(default.schedule_replace(Some(1000000000)).unwrap(), ());
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    std::thread::sleep(std::time::Duration::from_secs(3)); // 🕰︎
     assert_eq!(default.schedule_replace(None).unwrap(), ());
-    std::thread::sleep(std::time::Duration::from_secs(2));
+    std::thread::sleep(std::time::Duration::from_secs(2)); // 🕰︎
     assert_eq!(alice.schedule_trigger().unwrap_err().reject_message, "Permission 'ScheduleTrigger' is required".to_string());
     assert_eq!(default.schedule_trigger().unwrap(), ());
 }

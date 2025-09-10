@@ -264,4 +264,16 @@ impl Service<'_> {
     pub fn business_example_set(&self, arg0: String) -> Result<()> {
         self.update_call("business_example_set", encode_one(&arg0).unwrap())
     }
+    pub fn business_example_count_query(&self) -> Result<u64> {
+        self.query_call("business_example_count_query", Encode!(&()).unwrap())
+    }
+    pub fn business_example_count_set(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_count_set2(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set2", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_count_set3(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set3", encode_one(&arg0).unwrap())
+    }
 }
