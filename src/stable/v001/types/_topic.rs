@@ -19,6 +19,7 @@ pub enum RecordTopics {
     Pause = 254,        // 维护
     Initial = 255,      // 初始化
 }
+
 #[allow(unused)]
 impl RecordTopics {
     pub fn topic(&self) -> RecordTopic {
