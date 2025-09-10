@@ -43,15 +43,15 @@ pub trait Business:
     fn business_delete(&mut self, names: Vec<String>) {
         ic_cdk::trap("Not supported operation by this version.")
     }
+    fn business_example_cell_update2(&mut self, test: String) {
+        ic_cdk::trap("Not supported operation by this version.")
+    }
 
     // 内部使用的接口
     fn business_assets_get_file(&self, path: &str) -> Option<&crate::stable::AssetFile> {
         ic_cdk::trap("Not supported operation by this version.")
     }
-    fn business_assets_get(
-        &self,
-        hash: &crate::stable::HashDigest,
-    ) -> Option<&crate::stable::AssetData> {
+    fn business_assets_get(&self, hash: &crate::stable::HashDigest) -> Option<&crate::stable::AssetData> {
         ic_cdk::trap("Not supported operation by this version.")
     }
 }
@@ -79,6 +79,9 @@ impl Business for State {
     }
     fn business_delete(&mut self, names: Vec<String>) {
         self.get_mut().business_delete(names)
+    }
+    fn business_example_cell_update2(&mut self, test: String) {
+        self.get_mut().business_example_cell_update2(test)
     }
 
     fn business_assets_get_file(&self, path: &str) -> Option<&AssetFile> {
