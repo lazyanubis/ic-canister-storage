@@ -1,4 +1,4 @@
-pub use ic_canister_kit::types::*;
+use ic_canister_kit::types::*;
 use serde::{Deserialize, Serialize};
 
 // 初始化参数
