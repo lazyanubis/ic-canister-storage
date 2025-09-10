@@ -13,14 +13,14 @@ pub use super::permission::*;
 #[allow(unused)]
 pub use super::schedule::schedule_task;
 
-mod init;
-pub use init::*;
-mod upgrade;
-pub use upgrade::*;
-mod topic;
-pub use topic::*;
-mod canister_kit;
-pub use canister_kit::*;
+mod _init;
+pub use _init::*;
+mod _upgrade;
+pub use _upgrade::*;
+mod _topic;
+pub use _topic::*;
+mod _canister_kit;
+pub use _canister_kit::*;
 
 // 能序列化的和不能序列化的放在一起
 // 其中不能序列化的采用如下注解
