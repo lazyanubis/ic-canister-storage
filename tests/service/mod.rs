@@ -269,6 +269,15 @@ impl Service<'_> {
     pub fn business_example_cell_set(&self, arg0: String) -> Result<()> {
         self.update_call("business_example_cell_set", encode_one(&arg0).unwrap())
     }
+    pub fn business_example_cell_set2(&self, arg0: String) -> Result<()> {
+        self.update_call("business_example_cell_set2", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_cell_set3(&self, arg0: String) -> Result<()> {
+        self.update_call("business_example_cell_set3", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_cell_set4(&self, arg0: String) -> Result<()> {
+        self.update_call("business_example_cell_set4", encode_one(&arg0).unwrap())
+    }
     pub fn business_example_log_query(&self) -> Result<Vec<String>> {
         self.query_call("business_example_log_query", Encode!(&()).unwrap())
     }
@@ -295,6 +304,18 @@ impl Service<'_> {
     }
     pub fn business_example_set(&self, arg0: String) -> Result<()> {
         self.update_call("business_example_set", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_count_query(&self) -> Result<u64> {
+        self.query_call("business_example_count_query", Encode!(&()).unwrap())
+    }
+    pub fn business_example_count_set(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_count_set2(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set2", encode_one(&arg0).unwrap())
+    }
+    pub fn business_example_count_set3(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set3", encode_one(&arg0).unwrap())
     }
     pub fn business_example_vec_pop(&self) -> Result<Option<ExampleVec>> {
         self.update_call("business_example_vec_pop", Encode!(&()).unwrap())

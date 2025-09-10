@@ -25,11 +25,20 @@ pub trait Business:
     fn business_example_update(&mut self, test: String) {
         ic_cdk::trap("Not supported operation by this version.")
     }
+    fn business_example_count_query(&self) -> u64 {
+        ic_cdk::trap("Not supported operation by this version.")
+    }
+    fn business_example_count_update(&mut self, value: u64) {
+        ic_cdk::trap("Not supported operation by this version.")
+    }
 
     fn business_example_cell_query(&self) -> crate::stable::ExampleCell {
         ic_cdk::trap("Not supported operation by this version.")
     }
     fn business_example_cell_update(&mut self, test: String) {
+        ic_cdk::trap("Not supported operation by this version.")
+    }
+    fn business_example_cell_update2(&mut self, test: String) {
         ic_cdk::trap("Not supported operation by this version.")
     }
 
@@ -76,12 +85,21 @@ impl Business for State {
     fn business_example_update(&mut self, test: String) {
         self.get_mut().business_example_update(test)
     }
+    fn business_example_count_query(&self) -> u64 {
+        self.get().business_example_count_query()
+    }
+    fn business_example_count_update(&mut self, value: u64) {
+        self.get_mut().business_example_count_update(value)
+    }
 
     fn business_example_cell_query(&self) -> ExampleCell {
         self.get().business_example_cell_query()
     }
     fn business_example_cell_update(&mut self, test: String) {
         self.get_mut().business_example_cell_update(test)
+    }
+    fn business_example_cell_update2(&mut self, test: String) {
+        self.get_mut().business_example_cell_update2(test)
     }
 
     fn business_example_vec_query(&self) -> Vec<ExampleVec> {

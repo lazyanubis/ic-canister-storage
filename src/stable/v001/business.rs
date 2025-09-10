@@ -10,6 +10,14 @@ impl Business for InnerState {
         self.example_data = test
     }
 
+    fn business_example_count_query(&self) -> u64 {
+        self.example_count
+    }
+
+    fn business_example_count_update(&mut self, value: u64) {
+        self.example_count = value
+    }
+
     fn business_example_cell_query(&self) -> ExampleCell {
         self.example_cell.get().clone()
     }
@@ -19,6 +27,10 @@ impl Business for InnerState {
         let mut cell = self.example_cell.get().to_owned();
         cell.cell_data = test;
         trap_debug(self.example_cell.set(cell));
+    }
+
+    fn business_example_cell_update2(&mut self, _test: String) {
+        ic_cdk::trap("cell2 update panic");
     }
 
     fn business_example_vec_query(&self) -> Vec<ExampleVec> {
@@ -59,9 +71,7 @@ impl Business for InnerState {
 
     fn business_example_priority_queue_push(&mut self, item: u64) {
         use ic_canister_kit::common::trap;
-        let result = self
-            .example_priority_queue
-            .push(&ExampleVec { vec_data: item });
+        let result = self.example_priority_queue.push(&ExampleVec { vec_data: item });
         trap(result);
     }
     fn business_example_priority_queue_pop(&mut self) -> Option<ExampleVec> {

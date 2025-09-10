@@ -85,6 +85,7 @@ pub struct InnerState {
 
     // 业务数据
     pub example_data: String, // 样例数据 // ? 堆内存 序列化
+    pub example_count: u64,   // 样例数据 // ? 堆内存 序列化
 
     #[serde(skip, default = "init_example_cell_data")]
     pub example_cell: StableCell<ExampleCell>, // 样例数据 // ? 稳定内存
@@ -106,6 +107,7 @@ impl Default for InnerState {
 
             // 业务数据
             example_data: Default::default(),
+            example_count: Default::default(),
 
             example_cell: init_example_cell_data(),
             example_vec: init_example_vec_data(),

@@ -82,6 +82,13 @@ service : (opt InitArgs) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_example_cell_query : () -> (text) query;
   business_example_cell_set : (text) -> ();
+  business_example_cell_set2 : (text) -> ();
+  business_example_cell_set3 : (text) -> ();
+  business_example_cell_set4 : (text) -> ();
+  business_example_count_query : () -> (nat64) query;
+  business_example_count_set : (nat64) -> ();
+  business_example_count_set2 : (nat64) -> ();
+  business_example_count_set3 : (nat64) -> ();
   business_example_log_query : () -> (vec text) query;
   business_example_log_update : (text) -> (nat64);
   business_example_map_query : () -> (vec record { nat64; text }) query;
