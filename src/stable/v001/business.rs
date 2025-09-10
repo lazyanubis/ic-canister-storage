@@ -15,6 +15,18 @@ impl Business for InnerState {
         self.download_by(path, offset, size)
     }
 
+    fn business_assets_get_file(&self, path: &str) -> Option<&AssetFile> {
+        self.files.get(path)
+    }
+    fn business_assets_get(&self, hash: &HashDigest) -> Option<&AssetData> {
+        self.assets.get(hash)
+    }
+}
+
+#[allow(clippy::panic)] // ? 允许回滚
+#[allow(clippy::unwrap_used)] // ? 允许回滚
+#[allow(clippy::expect_used)] // ? 允许回滚
+impl MutableBusiness for InnerState {
     fn business_hashed_update(&mut self, hashed: bool) {
         self.hashed = hashed;
     }
@@ -28,12 +40,5 @@ impl Business for InnerState {
             self.clean_uploading(&name);
             self.clean_file(&name);
         }
-    }
-
-    fn business_assets_get_file(&self, path: &str) -> Option<&AssetFile> {
-        self.files.get(path)
-    }
-    fn business_assets_get(&self, hash: &HashDigest) -> Option<&AssetData> {
-        self.assets.get(hash)
     }
 }

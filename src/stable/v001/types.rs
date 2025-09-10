@@ -7,7 +7,7 @@ use strum_macros::{EnumIter, EnumString};
 pub use ic_canister_kit::types::*;
 
 #[allow(unused)]
-pub use super::super::{Business, ParsePermission, ScheduleTask};
+pub use super::super::{Business, ParsePermission, ScheduleTask, MutableBusiness};
 
 #[allow(unused)]
 pub use super::super::business::*;

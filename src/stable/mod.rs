@@ -114,7 +114,7 @@ impl State {
             V1(s) => s.as_ref(), // * 获取不可变对象
         }
     }
-    pub fn get_mut(&mut self) -> &mut dyn Business {
+    pub fn get_mut(&mut self) -> &mut dyn MutableBusiness {
         match self {
             V0(s) => s.as_mut(), // * 获取可变对象
             V1(s) => s.as_mut(), // * 获取可变对象
