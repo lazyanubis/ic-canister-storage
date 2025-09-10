@@ -1,13 +1,8 @@
-use std::str::FromStr;
-
-use serde::{Deserialize, Serialize};
-use strum::IntoEnumIterator;
-use strum_macros::{EnumIter, EnumString};
-
 pub use ic_canister_kit::types::*;
+use serde::{Deserialize, Serialize};
 
 #[allow(unused)]
-pub use super::super::{Business, ParsePermission, ScheduleTask, MutableBusiness};
+pub use super::super::{Business, MutableBusiness, ParsePermission, ScheduleTask};
 
 #[allow(unused)]
 pub use super::super::business::*;
@@ -18,57 +13,24 @@ pub use super::permission::*;
 #[allow(unused)]
 pub use super::schedule::schedule_task;
 
-// 初始化参数
-#[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType, Default)]
-pub struct InitArg {
-    pub supers: Option<Vec<UserId>>,     // init super administrators or deployer
-    pub schedule: Option<DurationNanos>, // init scheduled task or not
-}
+mod _init;
+pub use _init::*;
+mod _upgrade;
+pub use _upgrade::*;
+mod _topic;
+pub use _topic::*;
+mod _canister_kit;
+pub use _canister_kit::*;
 
-// 升级参数
-#[derive(Debug, Clone, Serialize, Deserialize, candid::CandidType)]
-pub struct UpgradeArg {
-    pub supers: Option<Vec<UserId>>,     // add new super administrators of not
-    pub schedule: Option<DurationNanos>, // init scheduled task or not
-}
-
-#[allow(unused)]
-#[derive(Debug, Clone, Copy, EnumIter, EnumString, strum_macros::Display)]
-pub enum RecordTopics {
-    // ! 新的权限类型从 0 开始
-    UploadFile = 0, // 上传文件
-    DeleteFile = 1, // 删除文件
-
-    // ! 系统倒序排列
-    CyclesCharge = 249, // 充值
-    Upgrade = 250,      // 升级
-    Schedule = 251,     // 定时任务
-    Record = 252,       // 记录
-    Permission = 253,   // 权限
-    Pause = 254,        // 维护
-    Initial = 255,      // 初始化
-}
-#[allow(unused)]
-impl RecordTopics {
-    pub fn topic(&self) -> RecordTopic {
-        *self as u8
-    }
-    pub fn topics() -> Vec<String> {
-        RecordTopics::iter().map(|x| x.to_string()).collect()
-    }
-    pub fn from(topic: &str) -> Result<Self, strum::ParseError> {
-        RecordTopics::from_str(topic)
-    }
-}
-
-// 框架需要的数据结构
-#[derive(Serialize, Deserialize, Default)]
-pub struct CanisterKit {
-    pub pause: Pause,             // 记录维护状态 // ? 堆内存 序列化
-    pub permissions: Permissions, // 记录自身权限 // ? 堆内存 序列化
-    pub records: Records,         // 记录操作记录 // ? 堆内存 序列化
-    pub schedule: Schedule,       // 记录定时任务 // ? 堆内存 序列化
-}
+// 业务类型
+mod common;
+pub use common::*;
+mod assets;
+pub use assets::*;
+mod upload;
+pub use upload::*;
+mod stable;
+use stable::*;
 
 // 能序列化的和不能序列化的放在一起
 // 其中不能序列化的采用如下注解
@@ -105,179 +67,6 @@ impl Default for InnerState {
             uploading: Default::default(),
         }
     }
-}
-
-use candid::CandidType;
-use ic_canister_kit::stable;
-
-const MEMORY_ID_ASSETS: MemoryId = MemoryId::new(0); // 存放实际文件，hash 为键
-
-fn init_assets_data() -> StableBTreeMap<SliceOfHashDigest, Vec<u8>> {
-    stable::init_map_data(MEMORY_ID_ASSETS)
-}
-
-// ============================== 文件数据 ==============================
-
-pub type SliceOfHashDigest = [u8; 4 + 32];
-
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct HashDigest([u8; 32]);
-
-impl HashDigest {
-    pub fn hex(&self) -> String {
-        hex::encode(self.0)
-    }
-}
-
-mod assets {
-    use candid::CandidType;
-    use serde::{Deserialize, Serialize};
-
-    use crate::stable::v001::types::init_assets_data;
-
-    use super::{HashDigest, SliceOfHashDigest};
-
-    // 单个文件数据
-    #[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-    pub struct AssetData {
-        // 堆内存无数据，存放在稳定内存了
-    }
-
-    const MAX_BUCKET_SIZE: u64 = 1024 * 1024 * 2;
-
-    #[inline]
-    fn get_key(hash: &HashDigest, chunk: u32) -> SliceOfHashDigest {
-        let mut key = [0; 36];
-        key[..4].copy_from_slice(&chunk.to_be_bytes());
-        key[4..].copy_from_slice(&hash.0);
-        key
-    }
-
-    impl AssetData {
-        pub fn from(hash: &HashDigest, data: Vec<u8>) -> Self {
-            // 切片
-            let size = data.len() as u64;
-            let chunks = size / MAX_BUCKET_SIZE;
-            let mut index = (0..chunks)
-                .map(|i| {
-                    let key = get_key(hash, i as u32);
-                    (key, MAX_BUCKET_SIZE * i, MAX_BUCKET_SIZE)
-                })
-                .collect::<Vec<_>>();
-            let remain = size - chunks * MAX_BUCKET_SIZE;
-            if 0 < remain {
-                let key = get_key(hash, chunks as u32);
-                index.push((key, MAX_BUCKET_SIZE * chunks, remain))
-            }
-
-            // 插入数据
-            for (key, offset, size) in index {
-                let offset = offset as usize;
-                let size = size as usize;
-                let data = data[offset..offset + size].to_vec();
-                ic_cdk::futures::spawn(async move {
-                    let mut assets = init_assets_data();
-                    assets.insert(key, data);
-                });
-            }
-
-            // 返回空对象
-            AssetData {}
-        }
-        pub fn slice(
-            &self,
-            hash: &HashDigest,
-            data_size: u64,
-            offset: usize,
-            size: usize,
-        ) -> std::borrow::Cow<'_, [u8]> {
-            assert!(offset < data_size as usize);
-            let offset_end = offset + size;
-            assert!(offset_end <= data_size as usize);
-
-            let mut result = vec![0; size];
-            let mut cursor = 0;
-
-            let assets = init_assets_data();
-
-            let mut last_chunk = offset as u64 / MAX_BUCKET_SIZE;
-            let mut offset = (offset as u64 - last_chunk * MAX_BUCKET_SIZE) as usize;
-            let mut size = size;
-            while 0 < size {
-                let remain = MAX_BUCKET_SIZE as usize - offset; // 本次最多可以取这么多
-                let fetch = std::cmp::min(size, remain); // 本次应该取的数据
-
-                let key = get_key(hash, last_chunk as u32);
-
-                let data = assets.get(&key);
-                let data = ic_canister_kit::common::trap(data.ok_or("can not be"));
-
-                result[cursor..cursor + fetch].copy_from_slice(&data[offset..offset + fetch]);
-
-                cursor += fetch; // 修改结果写入位置
-                last_chunk += 1; // 修改为下一个块
-                offset = (offset + fetch) % MAX_BUCKET_SIZE as usize; // 修改并检查新的块偏移位置
-                size -= fetch; // 修改剩余的数据
-            }
-
-            std::borrow::Cow::Owned(result)
-        }
-    }
-}
-
-pub use assets::AssetData;
-
-// 对外的路径数据 指向文件数据
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-pub struct AssetFile {
-    pub path: String,
-    pub created: TimestampNanos,
-    pub modified: TimestampNanos,
-    pub headers: Vec<(String, String)>,
-    pub hash: HashDigest,
-    pub size: u64,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone, Default)]
-pub struct HashedPath(HashSet<String>);
-
-// =========== 上传过程中的对象 ===========
-
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-pub struct UploadingFile {
-    pub path: String,
-    pub headers: Vec<(String, String)>,
-    pub hash: HashDigest, // hash 值，在 hashed 为 false 的情况下不使用
-    pub data: Vec<u8>,    // 上传中的数据
-
-    pub size: u64,          // 文件大小
-    pub chunk_size: u32,    // 块大小 块分割的大小
-    pub chunks: u32,        // 需要上传的次数
-    pub chunked: Vec<bool>, // 记录每一个块的上传状态
-}
-
-// 上传参数
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-pub struct UploadingArg {
-    pub path: String,
-    pub headers: Vec<(String, String)>, // 使用的 header
-    pub hash: HashDigest,               // hash 值，在 hashed 为 false 的情况下不使用
-    pub size: u64,                      // 文件大小
-    pub chunk_size: u32,                // 块大小 块分割的大小
-    pub index: u32,                     // 本次上传的数据
-    pub chunk: Vec<u8>,                 // 上传中的数据
-}
-
-// =========== 查询的对象 ===========
-
-#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
-pub struct QueryFile {
-    pub path: String,
-    pub size: u64,
-    pub headers: Vec<(String, String)>,
-    pub created: TimestampNanos,
-    pub modified: TimestampNanos,
-    pub hash: String,
 }
 
 impl InnerState {
