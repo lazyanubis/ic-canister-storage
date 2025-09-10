@@ -49,9 +49,9 @@ fn test_business_apis() {
     assert_eq!(default.business_example_count_query().unwrap(), 0);
     assert_eq!(default.business_example_count_set(1).unwrap(), ());
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set2(2).unwrap_err().reject_message.contains("test2 panic"), true);
+    assert_eq!(default.business_example_count_set_panic_in_state(2).unwrap_err().reject_message.contains("panic in state"), true);
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set3(3).unwrap_err().reject_message.contains("test3 panic"), true);
+    assert_eq!(default.business_example_count_set_panic_after_state(3).unwrap_err().reject_message.contains("panic after state"), true);
     assert_eq!(default.business_example_count_query().unwrap(), 1);
 
     // 🚩 2 test service data
@@ -72,12 +72,12 @@ fn test_business_apis() {
 
     // 🚩 3.1 test service cell
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
-    assert_eq!(default.business_example_cell_set2("test string 2".to_string()).unwrap_err().reject_message.contains("test2 panic"), true);
-    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string()); 
-    assert_eq!(default.business_example_cell_set3("test string 3".to_string()).unwrap_err().reject_message.contains("test3 panic"), true);
-    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string()); 
-    assert_eq!(default.business_example_cell_set4("test string 4".to_string()).unwrap_err().reject_message.contains("cell2 update panic"), true);
-    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string()); 
+    assert_eq!(default.business_example_cell_set_panic_in_state("test string 2".to_string()).unwrap_err().reject_message.contains("panic in state"), true);
+    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
+    assert_eq!(default.business_example_cell_set_panic_after_state("test string 3".to_string()).unwrap_err().reject_message.contains("panic after state"), true);
+    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
+    assert_eq!(default.business_example_cell_set_panic_in_business("test string 4".to_string()).unwrap_err().reject_message.contains("panic in business"), true);
+    assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
 
     // 🚩 4 test service vec
     assert_eq!(alice.business_example_vec_query().unwrap(), vec![]);
