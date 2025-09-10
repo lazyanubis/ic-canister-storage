@@ -1,5 +1,6 @@
-pub use ic_canister_kit::types::*;
 use std::str::FromStr;
+
+pub use ic_canister_kit::types::*;
 use strum::IntoEnumIterator;
 use strum_macros::{EnumIter, EnumString};
 
