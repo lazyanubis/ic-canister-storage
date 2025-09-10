@@ -81,8 +81,8 @@ service : (opt InitArgs) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   business_example_count_query : () -> (nat64) query;
   business_example_count_set : (nat64) -> ();
-  business_example_count_set2 : (nat64) -> ();
-  business_example_count_set3 : (nat64) -> ();
+  business_example_count_set_panic_after_state : (nat64) -> ();
+  business_example_count_set_panic_in_state : (nat64) -> ();
   business_example_query : () -> (text) query;
   business_example_set : (text) -> ();
   canister_status : () -> (CanisterStatusResult);

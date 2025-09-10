@@ -49,9 +49,9 @@ fn test_business_apis() {
     assert_eq!(default.business_example_count_query().unwrap(), 0);
     assert_eq!(default.business_example_count_set(1).unwrap(), ());
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set2(2).unwrap_err().reject_message.contains("test2 panic"), true);
+    assert_eq!(default.business_example_count_set_panic_in_state(2).unwrap_err().reject_message.contains("panic in state"), true);
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set3(3).unwrap_err().reject_message.contains("test3 panic"), true);
+    assert_eq!(default.business_example_count_set_panic_after_state(3).unwrap_err().reject_message.contains("panic after state"), true);
     assert_eq!(default.business_example_count_query().unwrap(), 1);
 
     // 🚩 2 test stable data

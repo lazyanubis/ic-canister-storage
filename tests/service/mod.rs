@@ -270,10 +270,13 @@ impl Service<'_> {
     pub fn business_example_count_set(&self, arg0: u64) -> Result<()> {
         self.update_call("business_example_count_set", encode_one(&arg0).unwrap())
     }
-    pub fn business_example_count_set2(&self, arg0: u64) -> Result<()> {
-        self.update_call("business_example_count_set2", encode_one(&arg0).unwrap())
+    pub fn business_example_count_set_panic_in_state(&self, arg0: u64) -> Result<()> {
+        self.update_call("business_example_count_set_panic_in_state", encode_one(&arg0).unwrap())
     }
-    pub fn business_example_count_set3(&self, arg0: u64) -> Result<()> {
-        self.update_call("business_example_count_set3", encode_one(&arg0).unwrap())
+    pub fn business_example_count_set_panic_after_state(&self, arg0: u64) -> Result<()> {
+        self.update_call(
+            "business_example_count_set_panic_after_state",
+            encode_one(&arg0).unwrap(),
+        )
     }
 }

@@ -58,7 +58,7 @@ fn business_example_count_set(value: u64) {
 
 // 修改
 #[ic_cdk::update(guard = "has_business_example_set")]
-fn business_example_count_set2(value: u64) {
+fn business_example_count_set_panic_in_state(value: u64) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
@@ -68,7 +68,7 @@ fn business_example_count_set2(value: u64) {
         |s, _done| {
             s.business_example_count_update(value);
 
-            ic_cdk::trap("test2 panic");
+            ic_cdk::trap("panic in state");
         },
         caller,
         RecordTopics::Example.topic(),
@@ -78,7 +78,7 @@ fn business_example_count_set2(value: u64) {
 
 // 修改
 #[ic_cdk::update(guard = "has_business_example_set")]
-fn business_example_count_set3(value: u64) {
+fn business_example_count_set_panic_after_state(value: u64) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
@@ -93,5 +93,5 @@ fn business_example_count_set3(value: u64) {
         arg_content,
     );
 
-    ic_cdk::trap("test3 panic");
+    ic_cdk::trap("panic after state");
 }
