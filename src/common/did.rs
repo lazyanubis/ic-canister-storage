@@ -8,8 +8,8 @@ fn __get_candid_interface_tmp_hack() -> String {
     todo!()
 }
 
-/// 这里是具体代码执行的逻辑，非测试编译才包含
-/// 一旦有这个，后面测试的方法就不管用了，因此配置非测试环境下包含该方法
+// 这里是具体代码执行的逻辑，非测试编译才包含
+// 一旦有这个，后面测试的方法就不管用了，因此配置非测试环境下包含该方法
 #[ic_cdk::query]
 #[cfg(not(test))]
 fn __get_candid_interface_tmp_hack() -> String {
