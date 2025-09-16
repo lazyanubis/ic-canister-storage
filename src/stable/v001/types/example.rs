@@ -8,7 +8,7 @@ pub struct ExampleCell {
 }
 
 impl Storable for ExampleCell {
-    fn to_bytes(&self) -> Cow<[u8]> {
+    fn to_bytes(&self) -> Cow<'_, [u8]> {
         use ic_canister_kit::common::trap;
         Cow::Owned(trap(ic_canister_kit::functions::stable::to_bytes(self)))
     }
@@ -27,7 +27,7 @@ pub struct ExampleVec {
 }
 
 impl Storable for ExampleVec {
-    fn to_bytes(&self) -> Cow<[u8]> {
+    fn to_bytes(&self) -> Cow<'_, [u8]> {
         let mut bytes = vec![];
         ic_canister_kit::stable::common::u64_to_bytes(&mut bytes, self.vec_data);
         Cow::Owned(bytes)
