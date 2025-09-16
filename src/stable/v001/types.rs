@@ -260,15 +260,14 @@ impl InnerState {
         Self::check_path_and_headers(&arg);
 
         // 2. 如果 hashed true 并且已经存在改 hash 值文件了，直接保存即可
-        if self.hashed && self.assets.contains_key(&arg.hash) {
-            if let Some(path) = self.hashes.get(&arg.hash) {
-                if let Some(path) = path.0.iter().next() {
-                    if let Some(file) = self.files.get(path) {
-                        self.put_file(arg.path, arg.headers, arg.hash, file.size); // size 不可信，只能从已存在的文件内容中查找
-                        return;
-                    }
-                }
-            }
+        if self.hashed
+            && self.assets.contains_key(&arg.hash)
+            && let Some(path) = self.hashes.get(&arg.hash)
+            && let Some(path) = path.0.iter().next()
+            && let Some(file) = self.files.get(path)
+        {
+            self.put_file(arg.path, arg.headers, arg.hash, file.size); // size 不可信，只能从已存在的文件内容中查找
+            return;
         }
 
         // 3. 检查其他参数
@@ -289,11 +288,9 @@ impl InnerState {
             // 4. 是否已经完整
             done = file.chunked.iter().all(|c| *c);
         }
-        if done {
-            if let Some(file) = self.uploading.remove(&arg.path) {
-                // 处理这个已经完成的数据
-                self.put_assets(file);
-            }
+        if done && let Some(file) = self.uploading.remove(&arg.path) {
+            // 处理这个已经完成的数据
+            self.put_assets(file);
         }
     }
     pub fn clean_uploading(&mut self, path: &String) {
