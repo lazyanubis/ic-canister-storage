@@ -13,6 +13,11 @@ impl Storable for ExampleCell {
         Cow::Owned(trap(ic_canister_kit::functions::stable::to_bytes(self)))
     }
 
+    fn into_bytes(self) -> Vec<u8> {
+        use ic_canister_kit::common::trap;
+        trap(ic_canister_kit::functions::stable::to_bytes(&self))
+    }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         use ic_canister_kit::common::trap;
         trap(ic_canister_kit::functions::stable::from_bytes(&bytes))
@@ -31,6 +36,12 @@ impl Storable for ExampleVec {
         let mut bytes = vec![];
         ic_canister_kit::stable::common::u64_to_bytes(&mut bytes, self.vec_data);
         Cow::Owned(bytes)
+    }
+
+    fn into_bytes(self) -> Vec<u8> {
+        let mut bytes = vec![];
+        ic_canister_kit::stable::common::u64_to_bytes(&mut bytes, self.vec_data);
+        bytes
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {

@@ -18,7 +18,10 @@ impl Business for InnerState {
     }
 
     fn business_example_map_query(&self) -> HashMap<u64, String> {
-        self.example_map.iter().collect()
+        self.example_map
+            .iter()
+            .map(|item| (*item.key(), item.value()))
+            .collect()
     }
 
     fn business_example_log_query(&self) -> Vec<String> {
@@ -42,18 +45,16 @@ impl MutableBusiness for InnerState {
     }
 
     fn business_example_cell_update(&mut self, test: String) {
-        use ic_canister_kit::common::trap_debug;
         let mut cell = self.example_cell.get().to_owned();
         cell.cell_data = test;
-        trap_debug(self.example_cell.set(cell));
+        self.example_cell.set(cell);
     }
     fn business_example_cell_update_panic_in_business(&mut self, _test: String) {
         ic_cdk::trap("panic in business");
     }
 
     fn business_example_vec_push(&mut self, test: u64) {
-        use ic_canister_kit::common::trap;
-        trap(self.example_vec.push(&ExampleVec { vec_data: test }))
+        self.example_vec.push(&ExampleVec { vec_data: test })
     }
     fn business_example_vec_pop(&mut self) -> Option<ExampleVec> {
         self.example_vec.pop()
@@ -73,9 +74,7 @@ impl MutableBusiness for InnerState {
     }
 
     fn business_example_priority_queue_push(&mut self, item: u64) {
-        use ic_canister_kit::common::trap;
-        let result = self.example_priority_queue.push(&ExampleVec { vec_data: item });
-        trap(result);
+        self.example_priority_queue.push(&ExampleVec { vec_data: item })
     }
     fn business_example_priority_queue_pop(&mut self) -> Option<ExampleVec> {
         self.example_priority_queue.pop()
