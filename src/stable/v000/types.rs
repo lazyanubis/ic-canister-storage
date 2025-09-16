@@ -34,7 +34,7 @@ pub struct InnerState {
 
 impl Default for InnerState {
     fn default() -> Self {
-        ic_cdk::println!("InnerState::default()");
+        ic_cdk::println!("v000.InnerState::default()");
         Self {
             canister_kit: Default::default(),
         }
