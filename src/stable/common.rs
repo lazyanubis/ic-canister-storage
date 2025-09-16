@@ -29,7 +29,7 @@ pub fn check_permission(
             }
             return Ok(());
         }
-        Err(format!("Permission '{}' is required", permission))
+        Err(format!("Permission '{permission}' is required"))
     })
 }
 
@@ -80,7 +80,7 @@ fn post_upgrade(args: Option<UpgradeArgs>) {
         let version = state.borrow().version(); // 先不可变借用取出版本号
         state
             .borrow_mut()
-            .record_update(record_id, format!("Next version: {}", version));
+            .record_update(record_id, format!("Next version: {version}"));
     });
 }
 

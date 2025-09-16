@@ -202,7 +202,7 @@ fn record_find_by_page(page: QueryPage, search: Option<RecordSearchArg>) -> Page
 #[ic_cdk::update(guard = "has_record_migrate")]
 fn record_migrate(max: u32) -> MigratedRecords<Record> {
     let caller = caller();
-    let arg_content = format!("wanna migrate {} records", max); // * 记录参数内容
+    let arg_content = format!("wanna migrate {max} records"); // * 记录参数内容
 
     with_mut_state(
         |s, done| {
