@@ -20,7 +20,7 @@ fn business_example_set(test: String) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
-    let arg_content = format!("set test: {}", test); // * 记录参数内容
+    let arg_content = format!("set test: {test}"); // * 记录参数内容
 
     with_mut_state(
         |s, _done| {
@@ -44,7 +44,7 @@ fn business_example_count_set(value: u64) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
-    let arg_content = format!("set value: {}", value); // * 记录参数内容
+    let arg_content = format!("set value: {value}"); // * 记录参数内容
 
     with_mut_state(
         |s, _done| {
@@ -62,7 +62,7 @@ fn business_example_count_set_panic_in_state(value: u64) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
-    let arg_content = format!("set value: {}", value); // * 记录参数内容
+    let arg_content = format!("set value: {value}"); // * 记录参数内容
 
     with_mut_state(
         |s, _done| {
@@ -82,7 +82,7 @@ fn business_example_count_set_panic_after_state(value: u64) {
     let _guard = call_once_guard(); // post 接口应该拦截
 
     let caller = caller();
-    let arg_content = format!("set value: {}", value); // * 记录参数内容
+    let arg_content = format!("set value: {value}"); // * 记录参数内容
 
     with_mut_state(
         |s, _done| {
