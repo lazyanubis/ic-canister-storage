@@ -21,9 +21,8 @@ fn test_business_apis() {
     let carol_identity = Principal::from_text("jmf34-nyd").unwrap();
     let anonymous_identity = Principal::from_text("2vxsx-fae").unwrap();
 
-    let canister_id = Principal::from_text("lxzze-o7777-77777-aaaaa-cai").unwrap();
 
-    pic.create_canister_with_id(Some(default_identity), None, canister_id).unwrap();
+    let canister_id = pic.create_canister_with_settings(Some(default_identity), None);
     pic.add_cycles(canister_id, INIT_CYCLES);
 
     pic.install_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
