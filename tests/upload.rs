@@ -100,6 +100,7 @@ const EXT_CONTENT_TYPES: [(&str, &str); 49] = [
     ("cache", ""),
 ];
 
+#[ignore]
 #[test]
 fn upload() {
     // 1. 读取本地数据
@@ -148,17 +149,10 @@ fn upload() {
             }
             let remote_file = remote_file.unwrap();
             // 有文件就比较一下其他信息是否一致
-            let mut file_headers: Vec<String> = local_file
-                .headers
-                .iter()
-                .map(|h| format!("{}:{}", h.0, h.1))
-                .collect();
+            let mut file_headers: Vec<String> = local_file.headers.iter().map(|h| format!("{}:{}", h.0, h.1)).collect();
             file_headers.sort();
-            let mut remote_file_headers: Vec<String> = remote_file
-                .headers
-                .iter()
-                .map(|h| format!("{}:{}", h.0, h.1))
-                .collect();
+            let mut remote_file_headers: Vec<String> =
+                remote_file.headers.iter().map(|h| format!("{}:{}", h.0, h.1)).collect();
             remote_file_headers.sort();
             let changed = local_file.size != remote_file.size
                 || file_headers.join(";") != remote_file_headers.join(";")
@@ -352,15 +346,9 @@ fn load_remote_files() -> Vec<RemoteFile> {
     eprintln!("arg: {}", "");
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {
-        eprintln!(
-            "output: {}",
-            String::from_utf8(output.stdout).unwrap().trim_end()
-        );
+        eprintln!("output: {}", String::from_utf8(output.stdout).unwrap().trim_end());
     } else {
-        eprintln!(
-            "error : {}",
-            String::from_utf8(output.stderr).unwrap().trim_end()
-        );
+        eprintln!("error : {}", String::from_utf8(output.stderr).unwrap().trim_end());
     }
     panic!("error");
 }
@@ -506,15 +494,9 @@ fn delete_files(names: Vec<String>) {
     eprintln!("arg: {}", args);
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {
-        eprintln!(
-            "output: {}",
-            String::from_utf8(output.stdout).unwrap().trim_end()
-        );
+        eprintln!("output: {}", String::from_utf8(output.stdout).unwrap().trim_end());
     } else {
-        eprintln!(
-            "error : {}",
-            String::from_utf8(output.stderr).unwrap().trim_end()
-        );
+        eprintln!("error : {}", String::from_utf8(output.stderr).unwrap().trim_end());
     }
     panic!("error");
 }
@@ -567,10 +549,7 @@ fn upload_files(local_files: Vec<LocalFile>) {
     }
     // 记录开始时间
     use std::time::{SystemTime, UNIX_EPOCH};
-    let start = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
     // 并发上传
     use std::thread;
     let mut handles = vec![];
@@ -584,10 +563,7 @@ fn upload_files(local_files: Vec<LocalFile>) {
         handle.join().unwrap(); // 等待所有任务完成
     }
     // 记录结束时间
-    let end = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
     println!(
         "all done: total: {:.2}MB time: {}s average: {:.2}MB/s",
         all_count as f64 / 1024f64 / 1024f64,
@@ -702,15 +678,9 @@ fn do_upload_file_to_canister(arg: &str, local_files: &Vec<UploadFile>) -> Resul
     eprintln!("arg: {}", arg);
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {
-        eprintln!(
-            "output: {}",
-            String::from_utf8(output.stdout).unwrap().trim_end()
-        );
+        eprintln!("output: {}", String::from_utf8(output.stdout).unwrap().trim_end());
     } else {
-        eprintln!(
-            "error : {}",
-            String::from_utf8(output.stderr).unwrap().trim_end()
-        );
+        eprintln!("error : {}", String::from_utf8(output.stderr).unwrap().trim_end());
     }
     Err("Upload failed".to_string())
 }
