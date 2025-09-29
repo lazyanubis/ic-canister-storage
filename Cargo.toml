@@ -38,8 +38,8 @@ ic-cdk = "0.18.7"
 # ic-certified-map = "0.4.0" # 可信验证
 
 # ! 升级后罐子接口参数序列化会报错
-serde = { version = "=1.0.219", features = ["derive"] } # 序列化/反序列化框架
-serde_json = "=1.0.143"                                 # json # ! 不能升级
+serde = { version = "1.0.228", features = ["derive"] } # 序列化/反序列化框架
+serde_json = "1.0.145"                                 # json
 
 ic-canister-kit = { version = "1.1.4", features = [
     "identity",
@@ -53,4 +53,4 @@ strum_macros = "0.27.2"
 
 [dev-dependencies]
 pocket-ic = "10.0.0"
-serde_bytes = "=0.11.17" # ! 不能升级
+serde_bytes = "0.11.19"
