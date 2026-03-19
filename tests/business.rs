@@ -48,17 +48,17 @@ fn test_business_apis() {
     assert_eq!(default.business_example_count_query().unwrap(), 0);
     assert_eq!(default.business_example_count_set(1).unwrap(), ());
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set_panic_in_state(2).unwrap_err().reject_message.contains("panic in state"), true);
+    assert!(default.business_example_count_set_panic_in_state(2).unwrap_err().reject_message.contains("panic in state"));
     assert_eq!(default.business_example_count_query().unwrap(), 1);
-    assert_eq!(default.business_example_count_set_panic_after_state(3).unwrap_err().reject_message.contains("panic after state"), true);
+    assert!(default.business_example_count_set_panic_after_state(3).unwrap_err().reject_message.contains("panic after state"));
     assert_eq!(default.business_example_count_query().unwrap(), 1);
 
     // 🚩 2 test service data
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
-    assert_eq!(default.pause_query().unwrap(), true);
+    assert!(default.pause_query().unwrap());
     pic.upgrade_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
     assert_eq!(default.pause_replace(None).unwrap(), ());
-    assert_eq!(default.pause_query().unwrap(), false);
+    assert!(!default.pause_query().unwrap());
     assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
 
     // 🚩 3 test service cell
@@ -71,11 +71,11 @@ fn test_business_apis() {
 
     // 🚩 3.1 test service cell
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
-    assert_eq!(default.business_example_cell_set_panic_in_state("test string 2".to_string()).unwrap_err().reject_message.contains("panic in state"), true);
+    assert!(default.business_example_cell_set_panic_in_state("test string 2".to_string()).unwrap_err().reject_message.contains("panic in state"));
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
-    assert_eq!(default.business_example_cell_set_panic_after_state("test string 3".to_string()).unwrap_err().reject_message.contains("panic after state"), true);
+    assert!(default.business_example_cell_set_panic_after_state("test string 3".to_string()).unwrap_err().reject_message.contains("panic after state"));
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
-    assert_eq!(default.business_example_cell_set_panic_in_business("test string 4".to_string()).unwrap_err().reject_message.contains("panic in business"), true);
+    assert!(default.business_example_cell_set_panic_in_business("test string 4".to_string()).unwrap_err().reject_message.contains("panic in business"));
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
 
     // 🚩 4 test service vec
@@ -134,10 +134,10 @@ fn test_business_apis() {
 
     // 🚩 8 test stable data
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
-    assert_eq!(default.pause_query().unwrap(), true);
+    assert!(default.pause_query().unwrap());
     pic.upgrade_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
     assert_eq!(default.pause_replace(None).unwrap(), ());
-    assert_eq!(default.pause_query().unwrap(), false);
+    assert!(!default.pause_query().unwrap());
     assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
     assert_eq!(alice.business_example_cell_query().unwrap(), "test string".to_string());
     assert_eq!(default.business_example_cell_query().unwrap(), "test string".to_string());
