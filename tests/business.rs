@@ -38,8 +38,8 @@ fn test_business_apis() {
 
     // 🚩 1 business query
     assert_eq!(alice.business_files().unwrap(), vec![]);
-    assert_eq!(alice.business_download("/123.txt".to_string()).unwrap_err().reject_message.contains("File not found"), true);
-    assert_eq!(alice.business_download("/456.txt".to_string()).unwrap_err().reject_message.contains("File not found"), true);
+    assert!(alice.business_download("/123.txt".to_string()).unwrap_err().reject_message.contains("File not found"));
+    assert!(alice.business_download("/456.txt".to_string()).unwrap_err().reject_message.contains("File not found"));
 
     // 🚩 2 business upload
     assert_eq!(alice.business_upload(vec![UploadingArg { hash: vec![0; 32].into(), chunk: vec![1, 2, 3].into(), path: "/123.txt".to_string(), size: 3, headers: vec![], index: 0, chunk_size: 3 }]).unwrap_err().reject_message, "Permission 'BusinessUpload' is required".to_string());

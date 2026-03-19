@@ -1,5 +1,4 @@
 /// 上传文件
-
 // 调用身份
 const IDENTITY: &str = "default";
 // 部署位置
@@ -181,7 +180,7 @@ fn load_local_files(prefix: &str, dir_path: &str, files: &mut Vec<LocalFile>) {
         let file_name = entry.file_name();
         let file_type = entry.file_type().unwrap();
 
-        let path = format!("{}/{}", dir_path, file_name.to_str().unwrap().to_string());
+        let path = format!("{}/{}", dir_path, file_name.to_str().unwrap());
         fn is_ignore(path: &str) -> bool {
             for ignore in IGNORE_FILES {
                 if path.ends_with(ignore) {
@@ -197,7 +196,7 @@ fn load_local_files(prefix: &str, dir_path: &str, files: &mut Vec<LocalFile>) {
 
         if file_type.is_file() {
             let mut file = load_local_file(&path);
-            file.path = (&file.path[prefix.len()..]).to_string();
+            file.path = (file.path[prefix.len()..]).to_string();
             files.push(file);
         } else if file_type.is_dir() {
             // 目录还需要进行递归
@@ -228,7 +227,7 @@ fn load_local_file(path: &str) -> LocalFile {
     LocalFile {
         path: path.to_string(),
         size: file_size,
-        headers: get_headers(&path),
+        headers: get_headers(path),
         modified: modified_time as u64, // 修改时间就是创建时间
         hash: do_hash(&buffer),
         data: buffer,
@@ -238,9 +237,9 @@ fn load_local_file(path: &str) -> LocalFile {
 fn do_hash(data: &Vec<u8>) -> String {
     use sha2::Digest;
     let mut hasher = sha2::Sha256::new();
-    hasher.update(&data[..]);
+    hasher.update(data);
     let digest: [u8; 32] = hasher.finalize().into();
-    hex::encode(&digest)
+    hex::encode(digest)
 }
 
 // 获取文件的 headers
@@ -268,8 +267,8 @@ fn get_headers(file: &str) -> Vec<(String, String)> {
             if &ext == "gz" {
                 // gz 需要额外取前面的拓展名
                 let mut ext = "";
-                let mut s = (&file_name[0..(file_name.len() - 3)]).split(".");
-                while let Some(e) = s.next() {
+                let s = file_name[0..(file_name.len() - 3)].split(".");
+                for e in s {
                     ext = e;
                 }
                 content_type = get_content_type(ext);
@@ -342,8 +341,8 @@ fn load_remote_files() -> Vec<RemoteFile> {
 
     eprintln!(">>>>>>>>>> ERROR <<<<<<<<<<<");
     eprintln!("identity: {}", IDENTITY);
-    eprintln!("api: {}", "business_files");
-    eprintln!("arg: {}", "");
+    eprintln!("api: business_files");
+    eprintln!("arg: ");
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {
         eprintln!("output: {}", String::from_utf8(output.stdout).unwrap().trim_end());
@@ -355,21 +354,21 @@ fn load_remote_files() -> Vec<RemoteFile> {
 
 fn parse_remote_files(output: String) -> Vec<RemoteFile> {
     let output = output.trim();
-    let output = (&output[6..(output.len() - 2)]).to_string();
+    let output = (output[6..(output.len() - 2)]).to_string();
     let output = output.trim();
 
-    if output.len() == 0 {
+    if output.is_empty() {
         return vec![];
     }
 
-    let output = (&output[9..(output.len() - 4)]).to_string();
+    let output = (output[9..(output.len() - 4)]).to_string();
     let output = output.trim();
 
     let mut files = vec![];
-    let mut splitted = output.split("};}; record { ");
-    while let Some(content) = splitted.next() {
+    let splitted = output.split("};}; record { ");
+    for content in splitted {
         // 解析 created
-        let content = (&content[10..]).to_string();
+        let content = (content[10..]).to_string();
         let created: u64 = content
             .split(r#" : int; modified = "#)
             .next()
@@ -394,7 +393,7 @@ fn parse_remote_files(output: String) -> Vec<RemoteFile> {
         content.next();
         let content = content.next().unwrap();
         // 解析 hash
-        let hash = (&content[0..64]).to_string();
+        let hash = (content[0..64]).to_string();
         let mut content = content.split(r#""; path = ""#);
         content.next();
         let content = content.next().unwrap();
@@ -419,8 +418,8 @@ fn parse_remote_files(output: String) -> Vec<RemoteFile> {
         let headers: Vec<(String, String)> = if 5 < content.len() {
             let content = &content[16..(content.len() - 4)];
             let mut headers = vec![];
-            let mut cs = content.split(r#"";}; record { ""#);
-            while let Some(s) = cs.next() {
+            let cs = content.split(r#"";}; record { ""#);
+            for s in cs {
                 let mut ss = s.split(r#""; ""#);
                 let key = ss.next().unwrap().to_string();
                 let value = ss.next().unwrap().to_string();
@@ -490,7 +489,7 @@ fn delete_files(names: Vec<String>) {
 
     eprintln!(">>>>>>>>>> ERROR <<<<<<<<<<<");
     eprintln!("identity: {}", IDENTITY);
-    eprintln!("api: {}", "business_delete");
+    eprintln!("api: business_delete");
     eprintln!("arg: {}", args);
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {
@@ -504,10 +503,7 @@ fn delete_files(names: Vec<String>) {
 // =========== 上传文件 ===========
 
 fn upload_files(local_files: Vec<LocalFile>) {
-    let local_files = local_files
-        .into_iter()
-        .map(|f| std::sync::Arc::new(f))
-        .collect::<Vec<_>>();
+    let local_files = local_files.into_iter().map(std::sync::Arc::new).collect::<Vec<_>>();
     let mut upload_files: Vec<Vec<UploadFile>> = vec![];
 
     let mut all_count = 0;
@@ -572,7 +568,7 @@ fn upload_files(local_files: Vec<LocalFile>) {
     );
 }
 
-fn do_upload_file(local_files: &Vec<UploadFile>, index: usize) {
+fn do_upload_file(local_files: &[UploadFile], index: usize) {
     // 1. 保存参数到文件
     let mut arg = String::from("");
     arg.push_str("(vec{");
@@ -593,7 +589,7 @@ fn do_upload_file(local_files: &Vec<UploadFile>, index: usize) {
                     file.file.size,
                     file.chunk_size,
                     file.index,
-                    (&file.file.data[file.offset..file.offset_end]).iter().map(|u|format!("{}:nat8", u)).collect::<Vec<String>>().join(";")
+                    (file.file.data[file.offset..file.offset_end]).iter().map(|u|format!("{}:nat8", u)).collect::<Vec<String>>().join(";")
                 )
             })
             .collect::<Vec<String>>()
@@ -617,16 +613,16 @@ fn do_upload_file(local_files: &Vec<UploadFile>, index: usize) {
 
 fn write_file(path: &str, content: &str) {
     use std::io::Write;
-    if let Ok(_) = std::fs::File::open(path) {
+    if std::fs::File::open(path).is_ok() {
         std::fs::remove_file(path).unwrap();
     }
-    std::fs::File::create(&path)
+    std::fs::File::create(path)
         .expect("create failed")
         .write_all(content.as_bytes())
         .expect("write candid failed");
 }
 
-fn do_upload_file_to_canister(arg: &str, local_files: &Vec<UploadFile>) -> Result<(), String> {
+fn do_upload_file_to_canister(arg: &str, local_files: &[UploadFile]) -> Result<(), String> {
     use std::process::Command;
 
     let _start = std::time::SystemTime::now()
@@ -648,7 +644,7 @@ fn do_upload_file_to_canister(arg: &str, local_files: &Vec<UploadFile>) -> Resul
         .arg("--output")
         .arg("idl")
         .output();
-    if let Err(_) = output {
+    if output.is_err() {
         return Err("Upload failed".to_string());
     }
     let output = output.unwrap();
@@ -669,12 +665,12 @@ fn do_upload_file_to_canister(arg: &str, local_files: &Vec<UploadFile>) -> Resul
                 file.file.hash
             )
         }
-        return Ok({});
+        return Ok(());
     }
 
     eprintln!(">>>>>>>>>> ERROR <<<<<<<<<<<");
     eprintln!("identity: {}", IDENTITY);
-    eprintln!("api: {}", "business_upload");
+    eprintln!("api: business_upload");
     eprintln!("arg: {}", arg);
     eprintln!("status: {}", output.status);
     if format!("{}", output.status).eq("exit status: 0") {

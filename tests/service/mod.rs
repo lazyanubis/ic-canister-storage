@@ -157,6 +157,7 @@ pub enum Permission {
     Forbidden(String),
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub enum PermissionUpdatedArg {
     UpdateRolePermission(String, Option<Vec<String>>),
@@ -257,19 +258,19 @@ impl Service<'_> {
         self.query_call("pause_query_reason", Encode!(&()).unwrap())
     }
     pub fn pause_replace(&self, arg0: Option<String>) -> Result<()> {
-        self.update_call("pause_replace", encode_one(&arg0).unwrap())
+        self.update_call("pause_replace", encode_one(arg0).unwrap())
     }
     pub fn permission_all(&self) -> Result<Vec<Permission>> {
         self.query_call("permission_all", Encode!(&()).unwrap())
     }
     pub fn permission_assigned_by_user(&self, arg0: Principal) -> Result<Option<Vec<Permission>>> {
-        self.query_call("permission_assigned_by_user", encode_one(&arg0).unwrap())
+        self.query_call("permission_assigned_by_user", encode_one(arg0).unwrap())
     }
     pub fn permission_assigned_query(&self) -> Result<Option<Vec<Permission>>> {
         self.query_call("permission_assigned_query", Encode!(&()).unwrap())
     }
     pub fn permission_find_by_user(&self, arg0: Principal) -> Result<Vec<String>> {
-        self.query_call("permission_find_by_user", encode_one(&arg0).unwrap())
+        self.query_call("permission_find_by_user", encode_one(arg0).unwrap())
     }
     pub fn permission_query(&self) -> Result<Vec<String>> {
         self.query_call("permission_query", Encode!(&()).unwrap())
@@ -278,19 +279,19 @@ impl Service<'_> {
         self.query_call("permission_roles_all", Encode!(&()).unwrap())
     }
     pub fn permission_roles_by_user(&self, arg0: Principal) -> Result<Option<Vec<String>>> {
-        self.query_call("permission_roles_by_user", encode_one(&arg0).unwrap())
+        self.query_call("permission_roles_by_user", encode_one(arg0).unwrap())
     }
     pub fn permission_roles_query(&self) -> Result<Option<Vec<String>>> {
         self.query_call("permission_roles_query", Encode!(&()).unwrap())
     }
     pub fn permission_update(&self, arg0: Vec<PermissionUpdatedArg>) -> Result<()> {
-        self.update_call("permission_update", encode_one(&arg0).unwrap())
+        self.update_call("permission_update", encode_one(arg0).unwrap())
     }
     pub fn record_find_by_page(&self, arg0: QueryPage, arg1: Option<RecordSearchArg>) -> Result<PageData> {
         self.query_call("record_find_by_page", encode_args((&arg0, &arg1)).unwrap())
     }
     pub fn record_migrate(&self, arg0: u32) -> Result<MigratedRecords> {
-        self.update_call("record_migrate", encode_one(&arg0).unwrap())
+        self.update_call("record_migrate", encode_one(arg0).unwrap())
     }
     pub fn record_topics(&self) -> Result<Vec<String>> {
         self.query_call("record_topics", Encode!(&()).unwrap())
@@ -299,7 +300,7 @@ impl Service<'_> {
         self.query_call("schedule_find", Encode!(&()).unwrap())
     }
     pub fn schedule_replace(&self, arg0: Option<u64>) -> Result<()> {
-        self.update_call("schedule_replace", encode_one(&arg0).unwrap())
+        self.update_call("schedule_replace", encode_one(arg0).unwrap())
     }
     pub fn schedule_trigger(&self) -> Result<()> {
         self.update_call("schedule_trigger", Encode!(&()).unwrap())
@@ -335,7 +336,7 @@ impl Service<'_> {
         self.query_call("business_hashed_find", Encode!(&()).unwrap())
     }
     pub fn business_hashed_update(&self, arg0: bool) -> Result<()> {
-        self.update_call("business_hashed_update", encode_one(&arg0).unwrap())
+        self.update_call("business_hashed_update", encode_one(arg0).unwrap())
     }
     pub fn business_upload(&self, arg0: Vec<UploadingArg>) -> Result<()> {
         self.update_call("business_upload", encode_one(&arg0).unwrap())

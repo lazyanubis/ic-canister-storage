@@ -39,42 +39,42 @@ fn test_common_apis() {
     // 🚩 1.1 permission permission_query
     assert_eq!(alice.version().unwrap(), 1_u32, "version");
     assert_eq!(alice.permission_all().unwrap(), vec![Forbidden("PauseQuery".to_string()), Permitted("PauseReplace".to_string()), Forbidden("PermissionQuery".to_string()), Permitted("PermissionFind".to_string()), Permitted("PermissionUpdate".to_string()), Permitted("RecordFind".to_string()), Permitted("RecordMigrate".to_string()), Permitted("ScheduleFind".to_string()), Permitted("ScheduleReplace".to_string()), Permitted("ScheduleTrigger".to_string()), Forbidden("BusinessQuery".to_string()), Permitted("BusinessUpload".to_string()), Permitted("BusinessDelete".to_string())]);
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(default.permission_query().unwrap(), vec!["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(bob.permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(alice_identity, Some(vec!["PermissionUpdate".to_string(), "PermissionQuery".to_string()]))]).unwrap_err().reject_message, "Permission 'PermissionUpdate' is required".to_string());
     assert_eq!(default.permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(alice_identity, Some(vec!["PermissionUpdate".to_string(), "PermissionQuery".to_string()]))]).unwrap(), ());
     assert_eq!(alice.permission_query().unwrap_err().reject_message, "Permission 'PermissionQuery' is required".to_string());
     assert_eq!(default.permission_query().unwrap(), vec!["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
-    assert_eq!(default.permission_find_by_user(alice_identity).unwrap(), vec!["PauseQuery", "PermissionUpdate", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(default.permission_find_by_user(alice_identity).unwrap(), ["PauseQuery", "PermissionUpdate", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(alice.permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(alice_identity, None)]).unwrap(), ());
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
-    assert_eq!(default.permission_query().unwrap(), vec!["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(default.permission_query().unwrap(), ["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
 
     // 🚩 1.2 permission permission update
     assert_eq!(default.permission_query().unwrap(), vec!["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(default.permission_find_by_user(default_identity).unwrap(), vec!["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessQuery", "BusinessUpload", "BusinessDelete"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
-    assert_eq!(default.permission_find_by_user(alice_identity).unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(default.permission_find_by_user(alice_identity).unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(alice.permission_find_by_user(default_identity).unwrap_err().reject_message, "Permission 'PermissionFind' is required".to_string());
     assert_eq!(alice.permission_find_by_user(alice_identity).unwrap_err().reject_message, "Permission 'PermissionFind' is required".to_string());
 
     // 🚩 1.3 permission roles
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(default.permission_update(vec![PermissionUpdatedArg::UpdateRolePermission("Admin".to_string(), Some(vec!["PauseReplace".to_string(), "PauseQuery".to_string()]))]).unwrap(), ());
     assert_eq!(default.permission_update(vec![PermissionUpdatedArg::UpdateUserRole(alice_identity, Some(vec!["Admin".to_string()]))]).unwrap(), ());
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseReplace", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseReplace", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
     assert_eq!(default.permission_update(vec![PermissionUpdatedArg::UpdateUserRole(alice_identity, None)]).unwrap(), ());
-    assert_eq!(alice.permission_query().unwrap(), vec!["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
+    assert_eq!(alice.permission_query().unwrap(), ["PauseQuery", "PermissionQuery", "BusinessQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>());
 
     // 🚩 2.1 pause permission
-    assert_eq!(default.pause_query().unwrap(), false);
+    assert!(!default.pause_query().unwrap());
     assert_eq!(default.pause_query_reason().unwrap(), None);
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
-    assert_eq!(default.pause_query().unwrap(), true);
+    assert!(default.pause_query().unwrap());
     assert_eq!(default.pause_query_reason().unwrap().unwrap().message, "reason".to_string());
 
     // 🚩 2.2 pause permission by alice
-    assert_eq!(alice.pause_query().unwrap(), true);
+    assert!(alice.pause_query().unwrap());
     assert_eq!(alice.pause_query_reason().unwrap().unwrap().message, "reason".to_string());
 
     // 🚩 2.3 pause no permission
@@ -83,7 +83,7 @@ fn test_common_apis() {
     assert_eq!(alice.pause_replace(None).unwrap(), ());
     assert_eq!(alice.pause_query().unwrap_err().reject_message, "Permission 'PauseQuery' is required".to_string());
     assert_eq!(alice.pause_query_reason().unwrap_err().reject_message, "Permission 'PauseQuery' is required".to_string());
-    assert_eq!(default.pause_query().unwrap(), false);
+    assert!(!default.pause_query().unwrap());
     assert_eq!(default.pause_query_reason().unwrap(), None);
 
     // 🚩 3 record no permission
@@ -94,7 +94,7 @@ fn test_common_apis() {
     assert_eq!(page_data.page, 1);
     assert_eq!(page_data.size, 1);
     assert_eq!(page_data.data.len(), 1);
-    assert_eq!(page_data.data.pop().unwrap().content.contains(r#"message: "reason" } -> None"#), true);
+    assert!(page_data.data.pop().unwrap().content.contains(r#"message: "reason" } -> None"#));
     assert_eq!(default.record_migrate(1).unwrap().removed, 0);
 
     // 🚩 4 schedule
