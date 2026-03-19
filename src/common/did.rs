@@ -39,9 +39,9 @@ fn update_candid() {
 
     // 输出到对应的文件
     use std::io::Write;
-    let filename = "sources/source.did"; // 输出至 did 文件
-    let _ = std::fs::remove_file(filename);
-    std::fs::File::create(&filename)
+    const FILENAME: &str = "sources/source.did"; // 输出至 did 文件
+    let _ = std::fs::remove_file(FILENAME);
+    std::fs::File::create(FILENAME)
         .expect("create failed")
         .write_all(text.as_bytes())
         .expect("write candid failed");
