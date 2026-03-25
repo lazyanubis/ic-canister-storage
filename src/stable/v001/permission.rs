@@ -23,7 +23,7 @@ pub const ACTION_BUSINESS_DELETE: &str = "BusinessDelete"; // 业务更新权限
 
 // 所有权限列表
 #[allow(unused)]
-pub const ACTIONS: [&str; 13] = [
+pub const ACTIONS: &[&str] = &[
     // 通用权限
     ACTION_PAUSE_QUERY,
     ACTION_PAUSE_REPLACE,
@@ -46,7 +46,7 @@ where
     F: Fn(&'a str) -> Result<Permission, ParsePermissionError<'a>>,
 {
     use ic_canister_kit::functions::permission::basic::parse_all_permissions;
-    let permissions = parse_all_permissions(&ACTIONS, parse);
+    let permissions = parse_all_permissions(ACTIONS, parse);
     let permissions = ic_canister_kit::common::trap(permissions);
     permissions.into_iter().collect()
 }
