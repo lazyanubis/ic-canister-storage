@@ -86,7 +86,7 @@ fn permission_all() -> Vec<Permission> {
     use ic_canister_kit::common::trap;
     use ic_canister_kit::functions::permission::basic::parse_all_permissions;
     with_state(|s| {
-        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        let permissions = parse_all_permissions(ACTIONS, |name| s.parse_permission(name));
         trap(permissions.map_err(|e| e.to_string()))
     })
 }
@@ -103,12 +103,12 @@ fn permission_find_by_user(user_id: UserId) -> Vec<&'static str> {
     with_state(|s| {
         use ic_canister_kit::common::trap;
         use ic_canister_kit::functions::permission::basic::parse_all_permissions;
-        let permissions = parse_all_permissions(&ACTIONS, |name| s.parse_permission(name));
+        let permissions = parse_all_permissions(ACTIONS, |name| s.parse_permission(name));
         trap(permissions)
             .iter()
             .zip(ACTIONS)
             .filter(|(permission, _)| s.permission_has(&user_id, permission))
-            .map(|(_, p)| p)
+            .map(|(_, p)| *p)
             .collect()
     })
 }
