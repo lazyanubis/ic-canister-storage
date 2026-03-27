@@ -5,7 +5,9 @@ start_time_s=$(date +%s)
 trap 'say test over' EXIT
 
 if [ ! -f "sources/source_opt.wasm.gz" ]; then
-    ic-wasm target/wasm32-unknown-unknown/release/template.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public
+    cargo test -p service update_candid -- --ignored --nocapture
+    cargo build --target wasm32-unknown-unknown --release
+    ic-wasm target/wasm32-unknown-unknown/release/service.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public
     gzip -kfn sources/source_opt.wasm
 fi
 
