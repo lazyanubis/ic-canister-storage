@@ -149,6 +149,8 @@ pub struct MigratedRecords {
     pub removed: u64,
 }
 
+// * ========================== Test Module ========================== *
+
 #[derive(Clone, Copy)]
 pub struct PocketedCanisterId<'a> {
     pub canister_id: Principal,
