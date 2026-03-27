@@ -6,10 +6,11 @@
                 "cargo test -p template update_candid -- --ignored --nocapture",
                 "cargo build --target wasm32-unknown-unknown --release",
                 "ic-wasm target/wasm32-unknown-unknown/release/template.wasm -o sources/source_opt.wasm metadata candid:service -f sources/source.did -v public",
-                "ic-wasm sources/source_opt.wasm -o sources/source_opt.wasm shrink"
+                "ic-wasm sources/source_opt.wasm -o sources/source_opt.wasm shrink",
+                "gzip -kfn sources/source_opt.wasm"
             ],
             "gzip": true,
-            "wasm": "sources/source_opt.wasm",
+            "wasm": "sources/source_opt.wasm.gz",
             "candid": "sources/source.did"
         }
     }
