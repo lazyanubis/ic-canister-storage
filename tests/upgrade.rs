@@ -1,5 +1,5 @@
 //! https://github.com/dfinity/pocketic
-use candid::{Principal, encode_one};
+use candid::encode_one;
 use pocket_ic::{ErrorCode, PocketIcBuilder, RejectCode, RejectResponse};
 
 mod util;
@@ -16,7 +16,7 @@ fn test_upgrade() {
     // let pic = PocketIc::new();
     let pic = PocketIcBuilder::new().with_nns_subnet().build();
 
-    let default_identity = Principal::from_text("2ibo7-dia").unwrap();
+    let (default_identity, ..) = util::get_identity();
 
     let canister_id = pic.create_canister_with_settings(Some(default_identity), None);
     pic.add_cycles(canister_id, 20 * 10_u128.pow(12));

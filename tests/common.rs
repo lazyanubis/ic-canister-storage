@@ -1,5 +1,5 @@
 //! https://github.com/dfinity/pocketic
-use candid::{Principal, encode_one};
+use candid::encode_one;
 use pocket_ic::PocketIc;
 
 mod util;
@@ -16,11 +16,7 @@ const WASM_MODULE_NEXT: &[u8] = include_bytes!("../sources/source_opt.wasm.gz");
 fn test_common_apis() {
     let pic = PocketIc::new();
 
-    let default_identity = Principal::from_text("2ibo7-dia").unwrap();
-    let alice_identity = Principal::from_text("uuc56-gyb").unwrap();
-    let bob_identity = Principal::from_text("hqgi5-iic").unwrap(); // cspell: disable-line
-    let carol_identity = Principal::from_text("jmf34-nyd").unwrap();
-    let anonymous_identity = Principal::from_text("2vxsx-fae").unwrap();
+    let (default_identity, alice_identity, bob_identity, carol_identity, anonymous_identity) = util::get_identity();
 
     let canister_id = pic.create_canister_with_settings(Some(default_identity), None);
     pic.add_cycles(canister_id, INIT_CYCLES);
