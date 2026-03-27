@@ -19,7 +19,7 @@ fn test_upgrade() {
     let default_identity = Principal::from_text("2ibo7-dia").unwrap();
 
     let canister_id = pic.create_canister_with_settings(Some(default_identity), None);
-    pic.add_cycles(canister_id, 20_000_000_000_000);
+    pic.add_cycles(canister_id, 20 * 10_u128.pow(12));
     // ! v0.0.1
     pic.install_canister(canister_id, WASM_MODULE_0_0_1.to_vec(), encode_one(Some(InitArgs::V1(InitArg { supers: None, schedule: None }))).unwrap(), Some(default_identity));
 

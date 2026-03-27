@@ -6,10 +6,9 @@ mod util;
 
 mod service;
 
-// 2T cycles
-const INIT_CYCLES: u128 = 2_000_000_000_000;
+const INIT_CYCLES: u128 = 2 * 10_u128.pow(12); // 2T cycles
 
-const WASM_MODULE: &[u8] = include_bytes!("../sources/source_opt.wasm");
+const WASM_MODULE_NEXT: &[u8] = include_bytes!("../sources/source_opt.wasm.gz");
 
 #[ignore]
 #[test]
@@ -26,7 +25,7 @@ fn test_common_apis() {
     let canister_id = pic.create_canister_with_settings(Some(default_identity), None);
     pic.add_cycles(canister_id, INIT_CYCLES);
 
-    pic.install_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
+    pic.install_canister(canister_id, WASM_MODULE_NEXT.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity));
 
     use service::*;
     use Permission::*;
