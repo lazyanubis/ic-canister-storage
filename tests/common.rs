@@ -2,6 +2,8 @@
 use candid::{Principal, encode_one};
 use pocket_ic::PocketIc;
 
+mod util;
+
 mod service;
 
 // 2T cycles

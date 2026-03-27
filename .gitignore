@@ -2,5 +2,7 @@
 target/
 .dfx/
 source_opt.wasm
+source_opt_*.wasm.gz
+source_opt.wasm.gz
 assets-test/
 .args.*
