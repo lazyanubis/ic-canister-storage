@@ -131,7 +131,7 @@ fn test_business_apis() {
     // 🚩 8 test stable data
     assert_eq!(default.pause_replace(Some("reason".to_string())).unwrap(), ());
     assert!(default.pause_query().unwrap());
-    pic.upgrade_canister(canister_id, WASM_MODULE.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
+    pic.upgrade_canister(canister_id, WASM_MODULE_NEXT.to_vec(), encode_one(None::<()>).unwrap(), Some(default_identity)).unwrap();
     assert_eq!(default.pause_replace(None).unwrap(), ());
     assert!(!default.pause_query().unwrap());
     assert_eq!(default.business_example_query().unwrap(), "test string".to_string());
