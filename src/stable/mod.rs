@@ -2,6 +2,9 @@ use candid::CandidType;
 use ic_canister_kit::types::Permission;
 use serde::{Deserialize, Serialize};
 
+mod state;
+pub use state::*;
+
 mod common;
 pub use common::*;
 
