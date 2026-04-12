@@ -273,7 +273,6 @@ type UploadingArg = record {
   chunk_size : nat32;
 };
 service : (opt InitArgs) -> {
-  __get_candid_interface_tmp_hack : () -> (text) query;
   business_delete : (vec text) -> ();
   business_download : (text) -> (blob) query;
   business_download_by : (text, nat64, nat64) -> (blob) query;
