@@ -2,10 +2,10 @@
 
 // 暴露出方法, 用这种 mock 方法来告诉 cdk 要生成对应的 did 接口
 // 由于测试方法和真正的方法有冲突，这里和下面的方法进行分开
-#[candid::candid_method(query)]
+// #[candid::candid_method(query)]
 #[cfg(test)]
 fn __get_candid_interface_tmp_hack() -> String {
-    todo!()
+    unimplemented!()
 }
 
 // 这里是具体代码执行的逻辑，非测试编译才包含
