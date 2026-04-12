@@ -2,7 +2,7 @@
 
 // 暴露出方法, 用这种 mock 方法来告诉 cdk 要生成对应的 did 接口
 // 由于测试方法和真正的方法有冲突，这里和下面的方法进行分开
-// #[candid::candid_method(query)]
+#[candid::candid_method(query)]
 #[cfg(test)]
 fn __get_candid_interface_tmp_hack() -> String {
     unimplemented!()
@@ -17,7 +17,12 @@ fn __get_candid_interface_tmp_hack() -> String {
     use crate::types::*;
 
     candid::export_service!();
-    __export_service()
+    ignore_hack(&__export_service())
+}
+
+// 由于 cdk 注入的 __export_service 方法会包含一个 hack 方法的接口，这里需要把它去掉
+fn ignore_hack(candid: &str) -> String {
+    candid.replace("  __get_candid_interface_tmp_hack : () -> (text) query;\n", "")
 }
 
 // =========== 打印 did ===========  要放到最下面
@@ -33,7 +38,7 @@ fn update_candid() {
 
     candid::export_service!(); // 这一步应该是注入 __export_service 方法
 
-    let text = __export_service(); // 取得 candid 内容
+    let text = ignore_hack(&__export_service()); // 取得 candid 内容
 
     // std::println!("{}", text); // 控制台输出
 
