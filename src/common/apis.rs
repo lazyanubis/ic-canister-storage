@@ -216,7 +216,7 @@ fn record_migrate(max: u32) -> MigratedRecords<Record> {
             result
         },
         caller,
-        RecordTopics::Schedule.topic(),
+        RecordTopics::Record.topic(),
         arg_content,
     )
 }
