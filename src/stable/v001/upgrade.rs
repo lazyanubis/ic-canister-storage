@@ -98,7 +98,7 @@ mod tests {
                 .canister_kit
                 .permissions
                 .permissions
-                .contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET))
+                .contains(&Permission::by_permit(ACTION_BUSINESS_UPLOAD))
         );
     }
 
@@ -122,8 +122,7 @@ mod tests {
         let assigned = state.canister_kit.permissions.user_permissions.get(&user);
 
         assert!(
-            assigned
-                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+            assigned.is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_UPLOAD)))
         );
     }
 
@@ -149,8 +148,7 @@ mod tests {
         let assigned = state.canister_kit.permissions.user_permissions.get(&user);
 
         assert!(
-            !assigned
-                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+            !assigned.is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_UPLOAD)))
         );
     }
 
@@ -174,8 +172,7 @@ mod tests {
         let assigned = state.canister_kit.permissions.role_permissions.get(&role);
 
         assert!(
-            assigned
-                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+            assigned.is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_UPLOAD)))
         );
     }
 
@@ -201,8 +198,7 @@ mod tests {
         let assigned = state.canister_kit.permissions.role_permissions.get(&role);
 
         assert!(
-            !assigned
-                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+            !assigned.is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_UPLOAD)))
         );
     }
 }
