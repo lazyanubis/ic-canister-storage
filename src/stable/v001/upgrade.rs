@@ -25,47 +25,44 @@ impl From<Box<LastState>> for Box<InnerState> {
         // 2. 刷新到最新权限集合，并只给旧版明确的管理员补齐新权限
         let old_permissions = state.canister_kit.permissions.permissions.clone();
         let old_permitted = ic_canister_kit::functions::permission::basic::permitted_permissions(&old_permissions);
-        let admin_users = if old_permitted.is_empty() {
-            Vec::new()
-        } else {
-            state
-                .canister_kit
-                .permissions
-                .user_permissions
-                .iter()
-                .filter_map(|(user_id, permissions)| (permissions == &old_permitted).then_some(*user_id))
-                .collect::<Vec<_>>()
-        };
-        let admin_roles = if old_permitted.is_empty() {
-            Vec::new()
-        } else {
-            state
-                .canister_kit
-                .permissions
-                .role_permissions
-                .iter()
-                .filter_map(|(role, permissions)| (permissions == &old_permitted).then_some(role.clone()))
-                .collect::<Vec<_>>()
-        };
+        let super_users = super_keys(&state.canister_kit.permissions.user_permissions, &old_permitted);
+        let super_roles = super_keys(&state.canister_kit.permissions.role_permissions, &old_permitted);
 
         let new_permissions = super::permission::get_all_permissions(|name| state.parse_permission(name));
         let new_permitted = ic_canister_kit::functions::permission::basic::permitted_permissions(&new_permissions);
+        let mut updated = Vec::with_capacity(super_users.len() + super_roles.len());
+        let users_updated = super_users
+            .into_iter()
+            .map(|user_id| PermissionUpdatedArg::UpdateUserPermission(user_id, Some(new_permitted.clone())));
+        let roles_updated = super_roles
+            .into_iter()
+            .map(|role| PermissionUpdatedArg::UpdateRolePermission(role, Some(new_permitted.clone())));
+        updated.extend(users_updated);
+        updated.extend(roles_updated);
+
+        // 刷新权限
         state.permission_reset(new_permissions);
-        for user_id in admin_users {
-            state
-                .canister_kit
-                .permissions
-                .user_permissions
-                .insert(user_id, new_permitted.clone());
-        }
-        for role in admin_roles {
-            state
-                .canister_kit
-                .permissions
-                .role_permissions
-                .insert(role, new_permitted.clone());
+        if !updated.is_empty() {
+            assert!(state.permission_update(updated).is_ok()); // 插入权限
         }
 
         Box::new(state)
     }
+}
+
+fn super_keys<K>(
+    permission_map: &std::collections::HashMap<K, std::collections::HashSet<Permission>>,
+    full_permissions: &std::collections::HashSet<Permission>,
+) -> Vec<K>
+where
+    K: Clone,
+{
+    if full_permissions.is_empty() {
+        return Vec::new();
+    }
+
+    permission_map
+        .iter()
+        .filter_map(|(key, permissions)| (permissions == full_permissions).then_some(key.clone()))
+        .collect()
 }
