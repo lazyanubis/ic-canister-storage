@@ -253,7 +253,7 @@ impl Service<'_> {
         self.query_call("wallet_balance", Encode!(&()).unwrap())
     }
     pub fn wallet_receive(&self) -> Result<candid::Nat> {
-        self.query_call("wallet_receive", Encode!(&()).unwrap())
+        self.update_call("wallet_receive", Encode!(&()).unwrap())
     }
     pub fn whoami(&self) -> Result<Principal> {
         self.query_call("whoami", Encode!(&()).unwrap())

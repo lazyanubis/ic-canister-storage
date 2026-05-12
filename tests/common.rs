@@ -93,6 +93,8 @@ fn test_common_apis() {
     assert_eq!(page_data.data.len(), 1);
     assert!(page_data.data.pop().unwrap().content.contains(r#"message: "reason" } -> None"#));
     assert_eq!(default.record_migrate(1).unwrap().removed, 0);
+    let page_data = default.record_find_by_page(QueryPage { page: 1, size: 10 }, Some(RecordSearchArg{ id: None, created: None, topic: Some(vec!["Record".to_string()]), content: Some("wanna migrate".to_string()), caller: None })).unwrap();
+    assert_eq!(page_data.total, 1);
 
     // 🚩 4 schedule
     assert_eq!(alice.schedule_find().unwrap_err().reject_message, "Permission 'ScheduleFind' is required".to_string());
