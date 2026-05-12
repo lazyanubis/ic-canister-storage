@@ -35,10 +35,11 @@ fn test_common_apis() {
 
     let public_permissions = ["PauseQuery", "PermissionQuery", "BusinessExampleQuery"].iter().map(|p| p.to_string()).collect::<Vec<_>>();
     let super_permissions = ["PauseQuery", "PauseReplace", "PermissionQuery", "PermissionFind", "PermissionUpdate", "RecordFind", "RecordMigrate", "ScheduleFind", "ScheduleReplace", "ScheduleTrigger", "BusinessExampleQuery", "BusinessExampleSet"].iter().map(|p| p.to_string()).collect::<Vec<_>>();
+    let all_permissions = super_permissions.iter().map(|p| if public_permissions.contains(p) { Forbidden(p.clone()) } else { Permitted(p.clone()) }).collect::<Vec<_>>();
 
     // 🚩 1.1 permission permission_query
     assert_eq!(alice.version().unwrap(), 1_u32, "version");
-    assert_eq!(alice.permission_all().unwrap(), vec![Forbidden("PauseQuery".to_string()), Permitted("PauseReplace".to_string()), Forbidden("PermissionQuery".to_string()), Permitted("PermissionFind".to_string()), Permitted("PermissionUpdate".to_string()), Permitted("RecordFind".to_string()), Permitted("RecordMigrate".to_string()), Permitted("ScheduleFind".to_string()), Permitted("ScheduleReplace".to_string()), Permitted("ScheduleTrigger".to_string()), Forbidden("BusinessExampleQuery".to_string()), Permitted("BusinessExampleSet".to_string())]);
+    assert_eq!(alice.permission_all().unwrap(), all_permissions);
     assert_eq!(alice.permission_query().unwrap(), public_permissions);
     assert_eq!(default.permission_query().unwrap(), super_permissions);
     assert_eq!(bob.permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(alice_identity, Some(vec!["PermissionUpdate".to_string(), "PermissionQuery".to_string()]))]).unwrap_err().reject_message, "Permission 'PermissionUpdate' is required".to_string());
