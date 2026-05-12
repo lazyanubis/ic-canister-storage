@@ -66,3 +66,143 @@ where
         .filter_map(|(key, permissions)| (permissions == full_permissions).then_some(key.clone()))
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::v000::types as v000_types;
+    use super::*;
+
+    fn v000_permissions() -> std::collections::HashSet<Permission> {
+        let state = LastState::default();
+        let permissions = v000_types::ACTIONS
+            .iter()
+            .filter_map(|name| state.parse_permission(name).ok())
+            .collect::<std::collections::HashSet<_>>();
+        assert_eq!(permissions.len(), v000_types::ACTIONS.len());
+        permissions
+    }
+
+    fn migrate(last_state: LastState) -> Box<InnerState> {
+        Box::new(last_state).into()
+    }
+
+    #[test]
+    fn should_refresh_permission_set_to_latest() {
+        let mut last_state = LastState::default();
+        last_state.permission_reset(v000_permissions());
+
+        let state = migrate(last_state);
+
+        assert!(
+            state
+                .canister_kit
+                .permissions
+                .permissions
+                .contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET))
+        );
+    }
+
+    #[test]
+    fn should_grant_new_permissions_to_super_user() {
+        let user = UserId::from_slice(&[1]);
+        let mut last_state = LastState::default();
+        let old_permissions = v000_permissions();
+        let old_permitted = ic_canister_kit::functions::permission::basic::permitted_permissions(&old_permissions);
+        last_state.permission_reset(old_permissions);
+        assert!(
+            last_state
+                .permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(
+                    user,
+                    Some(old_permitted)
+                )])
+                .is_ok()
+        );
+
+        let state = migrate(last_state);
+        let assigned = state.canister_kit.permissions.user_permissions.get(&user);
+
+        assert!(
+            assigned
+                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+        );
+    }
+
+    #[test]
+    fn should_not_grant_new_permissions_to_partial_user() {
+        let user = UserId::from_slice(&[2]);
+        let mut last_state = LastState::default();
+        let old_permissions = v000_permissions();
+        let partial_permissions = [Permission::by_permit(v000_types::ACTION_PAUSE_REPLACE)]
+            .into_iter()
+            .collect::<std::collections::HashSet<_>>();
+        last_state.permission_reset(old_permissions);
+        assert!(
+            last_state
+                .permission_update(vec![PermissionUpdatedArg::UpdateUserPermission(
+                    user,
+                    Some(partial_permissions)
+                )])
+                .is_ok()
+        );
+
+        let state = migrate(last_state);
+        let assigned = state.canister_kit.permissions.user_permissions.get(&user);
+
+        assert!(
+            !assigned
+                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+        );
+    }
+
+    #[test]
+    fn should_grant_new_permissions_to_super_role() {
+        let role = "Super".to_string();
+        let mut last_state = LastState::default();
+        let old_permissions = v000_permissions();
+        let old_permitted = ic_canister_kit::functions::permission::basic::permitted_permissions(&old_permissions);
+        last_state.permission_reset(old_permissions);
+        assert!(
+            last_state
+                .permission_update(vec![PermissionUpdatedArg::UpdateRolePermission(
+                    role.clone(),
+                    Some(old_permitted)
+                )])
+                .is_ok()
+        );
+
+        let state = migrate(last_state);
+        let assigned = state.canister_kit.permissions.role_permissions.get(&role);
+
+        assert!(
+            assigned
+                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+        );
+    }
+
+    #[test]
+    fn should_not_grant_new_permissions_to_partial_role() {
+        let role = "Operator".to_string();
+        let mut last_state = LastState::default();
+        let old_permissions = v000_permissions();
+        let partial_permissions = [Permission::by_permit(v000_types::ACTION_PAUSE_REPLACE)]
+            .into_iter()
+            .collect::<std::collections::HashSet<_>>();
+        last_state.permission_reset(old_permissions);
+        assert!(
+            last_state
+                .permission_update(vec![PermissionUpdatedArg::UpdateRolePermission(
+                    role.clone(),
+                    Some(partial_permissions)
+                )])
+                .is_ok()
+        );
+
+        let state = migrate(last_state);
+        let assigned = state.canister_kit.permissions.role_permissions.get(&role);
+
+        assert!(
+            !assigned
+                .is_some_and(|permissions| permissions.contains(&Permission::by_permit(ACTION_BUSINESS_EXAMPLE_SET)))
+        );
+    }
+}
